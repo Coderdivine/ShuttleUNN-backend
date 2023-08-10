@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "nodemon src/index.js",
-    "start":"node src/index.js",
-    "dev":"nodemon src/index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
   "dependencies": {
     "apidoc": "^0.54.0",
@@ -35,7 +35,7 @@
     "nodemailer": "^6.4.13",
     "nodemailer-express-handlebars": "^5.0.0",
     "nodemon": "^2.0.22",
-    "openai": "^3.2.1",
+    "openai": "^3.3.0",
     "paystack": "^2.0.1",
     "paystack-api": "^2.0.6",
     "pdf-lib": "^1.17.1",
