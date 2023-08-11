@@ -8,7 +8,7 @@ const uuid = require("uuid");
 const randonNum = require("../utils/randonNum");
 const { useAi } = require("../utils/ai");
 
-class UserService {
+class PostureService {
   async getAllPostures() {
     try {
       const posture = await Posture.find({});
@@ -33,6 +33,7 @@ class UserService {
       );
     }
   }
+
 
   async generatePrompt(postures) {
     const postureData = postures.map(
@@ -168,6 +169,7 @@ class UserService {
     }
   }
 
+
   async lastSixPosturesImage(user_id) {
     const currentDate = new Date();
     const startOfDay = new Date(
@@ -246,12 +248,111 @@ class UserService {
     return postures;
   }
 
-  async predictWorkout() {
-    //daily and weekly...
+  
+  async listWorkouts() {
+    try {
+        const workouts = await Workout.find({}, { title: 1, workout_id: 1, _id: 0 });
+        return workouts;
+    } catch (error) {
+        console.log(error.message);
+        throw new CustomError(
+            "An error occurred. Please attempt again later.",
+            500
+          );  
+    }
   }
 
-  // async createSocialSharingLink() {}
-  // async createPostureHistory() {}
+  async groupPosturesByPeriod(user_id, period) {
+    try {
+        const currentDate = new Date();
+        let startDate, endDate;
+      
+        if (period === 'day') {
+          startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+          endDate = new Date(startDate);
+          endDate.setDate(endDate.getDate() + 1);
+        } else if (period === 'week') {
+          startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+          endDate = new Date(startDate);
+          endDate.setDate(endDate.getDate() + 7);
+        } else if (period === 'month') {
+          startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+          endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        } else if (period === 'year') {
+          startDate = new Date(currentDate.getFullYear(), 0, 1);
+          endDate = new Date(currentDate.getFullYear() + 1, 0, 1);
+        } else {
+          throw new Error('Invalid period');
+        }
+      
+        const postures = await Posture.find(
+          {
+            user_id: user_id,
+            date: { $gte: startDate, $lt: endDate }
+          },
+          {
+            posture_name: 1,
+            posture_accuracy: 1,
+            _id: 0
+          }
+        );
+      
+        const badPostures = postures.filter(posture => posture.posture_accuracy >= 20 && posture.posture_accuracy <= 40);
+        const goodPostures = postures.filter(posture => posture.posture_accuracy >= 50 && posture.posture_accuracy <= 99);
+      
+        return { badPostures, goodPostures };
+    } catch (error) {
+        throw new CustomError(
+            "An error occurred. Please attempt again later.",
+            500
+          );
+    }
+
+  }
+  
+  async predictWorkout(user_id, period) {
+    try {
+        const { badPostures, goodPostures } = await this.groupPosturesByPeriod(user_id, period);
+        const suggestedWorkouts = [];
+        if (badPostures.length > 0) {
+          suggestedWorkouts.push(...await this.suggestWorkouts('bad', badPostures));
+        }
+    
+        if (goodPostures.length > 0) {
+          suggestedWorkouts.push(...await this.suggestWorkouts('good', goodPostures));
+        }
+      
+        return suggestedWorkouts;
+    } catch (error) {
+        throw new CustomError(
+            "An error occurred. Please attempt again later.",
+            500
+          );
+    }
+  }
+
+  async suggestWorkouts(postureType, postures) {
+    try {
+
+        const workouts = await this.listWorkouts();
+        const prompt = await this.generatePromptForPostures(postureType, postures);
+        const response = await useAi(prompt);
+        const suggestedWorkoutIds = response.message.choices[0].text.split(',');
+        return suggestedWorkoutIds.map(suggestedId => workouts.find(w => w.workout_id === suggestedId)).filter(workout => workout);
+     
+    } catch (error) {
+        throw new CustomError(
+            "An error occurred. Please attempt again later.",
+            500
+          );
+    }
+ }
+  
+  async generatePromptForPostures(postureType, postures) {
+    const postureData = postures.map(posture => `("${posture.posture_name}", "${posture.posture_accuracy}")`);
+    return `Suggest ${postureType} posture workouts based on: ${postureData.join(',')}`;
+  }
+
 }
 
-module.exports = new UserService();
+module.exports = new PostureService();

@@ -11,7 +11,7 @@ async function useAi(prompt){
     try {
         const requestData = {
             prompt: prompt,
-            max_tokens: 1000,
+            max_tokens: 2000,
         };
         const response = await openai.Completion.create(requestData);
         console.log('Generated code:\n', response.choices[0].text);

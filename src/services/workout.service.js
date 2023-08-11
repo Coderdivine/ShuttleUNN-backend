@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const uuid = require("uuid");
 const randonNum = require("../utils/randonNum");
 
-class UserService {
+class WorkoutService {
 
   async getWorkouts(){
     try {
@@ -178,4 +178,4 @@ class UserService {
 
 }
 
-module.exports = new UserService();
+module.exports = new WorkoutService();
