@@ -79,6 +79,7 @@ class UserService {
     const findAndDeleteEmail = await VToken.deleteMany({ email: data.email });
     console.log({ findAndDeleteEmail });
     const otp = await randonNum.randomNum();
+    console.log({ otp })
     const hash = await bcrypt.hash(otp, 10);
     const newVtoken = new VToken({
       email,
