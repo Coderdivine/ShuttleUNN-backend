@@ -34,6 +34,50 @@ class WorkoutController {
         }
     }
 
+    async deleteWorkout(req, res){
+        try{
+            if(!req.body) throw new CustomError("Please request can not be completed",400);
+            const result = await WorkoutService.deleteWorkout(req.body.workout_id);
+            if(!result) throw new CustomError("Unable to get workouts",400);
+            res.status(201).send(response("Workout delete",result));
+        }catch(error){
+            throw new CustomError(error.message,500);
+        }
+    }
+
+    async updateWorkout(req, res){
+        try{
+            if(!req.body) throw new CustomError("request can't be completed. Please login again",400);
+            const result = await WorkoutService.updateWorkout(req.body.workout_id, req.body);
+            if(!result) throw new CustomError("Unable to update workout",400);
+            res.status(201).send(response("Workout updated.",result));
+        }catch(error){
+            throw new CustomError(error.message,500);
+        }
+    }
+
+    async saveWorkout(req, res){
+        try{
+            if(!req.body) throw new CustomError("Request can't be completed.",400);
+            const result = await WorkoutService.saveWorkout(req.body.user_id, req.body);
+            if(!result) throw new CustomError("Unable to save workout",400);
+            res.status(201).send(response("Workout saved",result));
+        }catch(error){
+            throw new CustomError(error.message,500);
+        }
+    }
+
+    async addNewWorkoutInWorkouts(req, res){
+        try{
+            if(!req.body) throw new CustomError("Request can't be completed.",400);
+            const result = await WorkoutService.addNewWorkoutInWorkouts(req.body.workout_id, req.body);
+            if(!result) throw new CustomError("Unable to add workout",400);
+            res.status(201).send(response("Workout added",result));
+        }catch(error){
+            throw new CustomError(error.message,500);
+        }
+    }
+
     async register(req, res){
         try{
             const result = await WorkoutService.getWorkouts();
