@@ -78,11 +78,23 @@ class WorkoutController {
         }
     }
 
-    async register(req, res){
+    async editWorkoutInWorkouts(req, res){
         try{
-            const result = await WorkoutService.getWorkouts();
-            if(!result) throw new CustomError("Unable to get workouts",400);
-            res.status(201).send(response("All workouts",result));
+            if(!req.body) throw new CustomError("Request can't be completed.",400);
+            const result = await WorkoutService.editWorkoutInWorkouts(req.body.workout_id, req.body.identity, req.body.updatedValue, req.body.updatedField);
+            if(!result) throw new CustomError("Unable to edit workout",400);
+            res.status(201).send(response("Workout Edited",result));
+        }catch(error){
+            throw new CustomError(error.message,500);
+        }
+    }
+
+    async deleteFromWorkoutInWorkouts(req, res){
+        try{
+            if(!req.body) throw new CustomError("please send the right request",400);
+            const result = await WorkoutService.deleteFromWorkoutInWorkouts(req.body.workout_id, req.body.identity);
+            if(!result) throw new CustomError("Unable to delete workout",400);
+            res.status(201).send(response("Workout deleted",result));
         }catch(error){
             throw new CustomError(error.message,500);
         }
