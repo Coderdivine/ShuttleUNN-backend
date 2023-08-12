@@ -16,8 +16,8 @@ class WorkoutContoller {
 
     async getUserPostures(req, res){
         try {
-            if(!req.body) throw new CustomError("No request body passed.",400);
-            const result = await PostureService.getUserPostures(req.body.user_id, req.body.timeInterval);
+            if(!req.params) throw new CustomError("No request params passed.",400);
+            const result = await PostureService.getUserPostures(req.params.user_id, req.params.timeInterval);
             if(!result) throw new CustomError("Oops! couldn't fetch postures",500);
             res.status(201).send(response("Posture fetched.",result));
         } catch (error) {
