@@ -14,12 +14,16 @@ const Billing = new Schema(
         type:String,
         required:true,
     },
+    period:{
+        type:String,
+        required:true
+    },
     plan_name:{
         type:String,
         required:true
     },
     plan_price:{
-        type:String,
+        type:Number,
         required:true
     },
     time:{

@@ -197,6 +197,7 @@ class UserService {
       const nextExpires = 100000000;
       const newBilling = new Billing({
         user_id,
+        period: data.period,
         billing_id: uuid.v4().toString(),
         plan_name: data.plan_name,
         plan_price: data.plan_price,
