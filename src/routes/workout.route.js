@@ -9,7 +9,7 @@ router.get("/workouts", WorkoutCtrl.getWorkouts);
 router.get("/workout", WorkoutCtrl.getWorkout);
 router.post("/delete", WorkoutCtrl.deleteWorkout);
 router.post("/update", WorkoutCtrl.updateWorkout);
-router.post("/save", Workout.saveWorkout);
+router.post("/save", WorkoutCtrl.saveWorkout);
 router.post("/add-new-workout-to-workouts", WorkoutCtrl.addNewWorkoutInWorkouts);
 router.post("/edit-workout-in-workouts", WorkoutCtrl.editWorkoutInWorkouts);
 router.post("/delete-workout-in-workouts", WorkoutCtrl.deleteFromWorkoutInWorkouts);
