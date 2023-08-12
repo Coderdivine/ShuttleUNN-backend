@@ -139,6 +139,8 @@ class UserService {
         );
       const user_account = await User.findOne({ user_id });
       user_account.isSuspended = true;
+      const saved = await user_account.save();
+      return saved;
     } catch (error) {
       throw new CustomError(
         "An issue has arisen. Please try again later.",
@@ -156,6 +158,8 @@ class UserService {
         );
       const user_account = await User.findOne({ user_id });
       user_account.isSuspended = false;
+      const saved = await user_account.save();
+      return saved;
     } catch (error) {
       throw new CustomError(
         "An issue has arisen. Please try again later.",
