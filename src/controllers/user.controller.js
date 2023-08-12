@@ -158,7 +158,7 @@ class UserContoller {
     async addToUserRoutine(req, res){
         try {
             if(!req.body) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
-            const result = await UserService.addToUserRoutine(req.body.user_id, req.body.routine_name);
+            const result = await UserService.addToUserRoutine(req.body.user_id, req.body.routine_name, req.body.time);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("Routine successfully added.",result));
         } catch (error) {

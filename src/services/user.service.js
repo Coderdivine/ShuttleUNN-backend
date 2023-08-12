@@ -235,7 +235,7 @@ class UserService {
     }
   }
 
-  async addToUserRoutine(user_id, routine_name) {
+  async addToUserRoutine(user_id, routine_name, time) {
     try {
 
       if (!user_id)
@@ -247,7 +247,7 @@ class UserService {
       const newRoutine = {
         routine_id:uuid.v4().toString(),
         routine: routine_name,
-        time: 120,
+        time,
         date: Date.now(),
       };
 
