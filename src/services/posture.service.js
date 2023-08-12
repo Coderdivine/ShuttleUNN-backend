@@ -9,6 +9,7 @@ const randonNum = require("../utils/randonNum");
 const { useAi } = require("../utils/ai");
 
 class PostureService {
+  
   async getAllPostures() {
     try {
       const posture = await Posture.find({});
