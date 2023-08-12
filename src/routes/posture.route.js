@@ -13,4 +13,5 @@ router.post("/common-posture", PostureCtrl.fiveCommonPostures);
 router.post("/posture-period", PostureCtrl.groupPosturesByPeriod);
 router.post("/predict-workout", PostureCtrl.predictWorkout);
 
+
 module.exports = router;
