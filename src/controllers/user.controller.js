@@ -115,8 +115,8 @@ class UserContoller {
 
     async userBilling(req, res){
         try {
-            if(!req.body) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
-            const result = await UserService.userBilling(req.body.user_id);
+            if(!req.params) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
+            const result = await UserService.userBilling(req.params.user_id);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("User billing listings.",result));
         } catch (error) {
@@ -143,8 +143,8 @@ class UserContoller {
 
     async getUserRoutine(req, res){
         try {
-            if(!req.body) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
-            const result = await UserService.getUserRoutine(req.body.user_id);
+            if(!req.params) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
+            const result = await UserService.getUserRoutine(req.params.user_id);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("User routine.",result));
         } catch (error) {
