@@ -75,11 +75,9 @@ class UserService {
   async resetPassword(data) {
     const { email } = data;
     if (!data.email) throw new CustomError("User email is needed", 400);
-    console.log({ data });
     const findAndDeleteEmail = await VToken.deleteMany({ email: data.email });
     console.log({ findAndDeleteEmail });
     const otp = await randonNum.randomNum();
-    console.log({ otp })
     const hash = await bcrypt.hash(otp, 10);
     const newVtoken = new VToken({
       email,
