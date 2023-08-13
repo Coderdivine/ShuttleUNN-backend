@@ -16,12 +16,13 @@ class WorkoutContoller {
 
     async addPostures(req, res){
         try {
-            if(!req.body) throw new CustomError("No request params passed.",400);
+            if(!req.body) throw new CustomError("No request found.", 400);
             const result = await PostureService.addPosture(req.body);
-            if(!result) throw new CustomError("Oops! couldn't add posture",500);
+            if(!result) throw new CustomError("Oops! couldn't add posture", 400);
             res.status(201).send(response("Posture added.",result));
         } catch (error) {
-            throw new CustomError("An error occurred. Please attempt again later.",500)
+            console.log({ error });
+            throw new CustomError("An error occurred. Please attempt again later.", 500)
         }
     }
 
