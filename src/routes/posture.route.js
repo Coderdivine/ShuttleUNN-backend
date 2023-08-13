@@ -3,6 +3,7 @@ const auth = require("../middlewares/auth.middleware")();
 const PostureCtrl = require("../controllers/posture.controller");
 
 router.post("/add", PostureCtrl.addPostures);
+router.post("/link-device", PostureCtrl.linkDevSensorId);
 router.get("/postures", PostureCtrl.getAllPostures);
 router.get("/user-posture", PostureCtrl.getUserPostures);
 router.post("/daily", PostureCtrl.getPostureSummaryOfTheDay);

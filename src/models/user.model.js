@@ -10,6 +10,10 @@ const UserSchema = new Schema(
         type:String,
         required:true,
     },
+    devsensor_id:{
+      type:String,
+      default:uuid.v4()
+    },
     username:{
       type:String,
       default:"No username"

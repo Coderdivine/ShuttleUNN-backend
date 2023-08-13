@@ -10,6 +10,19 @@ const { useAi } = require("../utils/ai");
 
 class PostureService {
 
+  async linkDevSensorId({ user_id, devsensor_id }){
+        try {
+           const user = await User.findOne({ user_id });
+           if(!user) throw new CustomError("User details not found", 400);
+          if(user.devsensor_id !== devsensor_id) throw new CustomError("Please insert the right devSensor ID.", 400);
+          user.isLinked = true;
+          const saved = await user.save();
+          return saved;
+        } catch (error) {
+          throw new CustomError("An error occurred. Please attempt again later.", 500);
+        }
+  }
+
   async addPosture({ user_id, devsensor_id, posture_name, posture_accuracy, posture_rate }){
     try {
         const user = await User.findOne({ user_id });
@@ -32,7 +45,6 @@ class PostureService {
     }
   }
 
-  
   async getAllPostures() {
     try {
       const posture = await Posture.find({});

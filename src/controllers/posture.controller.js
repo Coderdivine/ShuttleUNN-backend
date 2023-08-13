@@ -4,6 +4,17 @@ const CustomError = require("../utils/custom-error");
 
 class WorkoutContoller {
 
+    async linkDevSensorId(req, res){
+        try {
+            if(!req.body) throw new CustomError("Invalid request", 400);
+            const result = await PostureService.linkDevSensorId(req.body);
+            if(!result) throw new CustomError("No result was found.", 400);
+            res.status(201).send(response("Dev Sensor device linked.",result));
+        } catch (error) {
+            throw new CustomError("An error occurred. Please attempt again later.", 500)
+        }
+    }
+
     async getAllPostures(req, res){
         try {
             const result = await PostureService.getAllPostures();
