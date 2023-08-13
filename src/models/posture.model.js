@@ -23,11 +23,11 @@ const Posture = new Schema(
       required: true,
     },
     posture_accuracy: {
-      type: String,
+      type: Number,
       required: true,
     },
     posture_rate: {
-      type: String,
+      type: Number,
       required: true,
     },
     date: {
@@ -60,6 +60,7 @@ Posture.pre("save", async function (next) {
 
     next();
   } catch (error) {
+    console.log({ "PreSave Error":error })
     return next(error);
   }
 });
