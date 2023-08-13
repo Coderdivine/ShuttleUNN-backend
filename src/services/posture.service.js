@@ -9,6 +9,27 @@ const randonNum = require("../utils/randonNum");
 const { useAi } = require("../utils/ai");
 
 class PostureService {
+
+  async addPosture({ user_id, devsensor_id, posture_name, posture_accuracy, posture_rate, date }){
+    try {
+        const user = await User.findOne({ user_id });
+        if(!user.isLinked) throw new CustomError("Please associate your devSensor ID to initiate tracking.", 400);
+        const newPosture = new Posture({
+              posture_id:uuid.v4(),
+              user_id,
+              devsensor_id, 
+              posture_name, 
+              posture_accuracy, 
+              posture_rate, 
+              date
+        });
+        const saved = await newPosture.save();
+        return saved;
+    } catch (error) {
+      throw new CustomError("An error occurred. Please attempt again later.", 500);
+    }
+  }
+
   
   async getAllPostures() {
     try {
