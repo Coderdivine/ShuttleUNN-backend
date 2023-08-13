@@ -25,6 +25,7 @@ class PostureService {
         const saved = await newPosture.save();
         return saved;
     } catch (error) {
+      console.log({ error })
       throw new CustomError("An error occurred. Please attempt again later.", 500);
     }
   }

@@ -21,7 +21,6 @@ class WorkoutContoller {
             if(!result) throw new CustomError("Oops! couldn't add posture", 400);
             res.status(201).send(response("Posture added.",result));
         } catch (error) {
-            console.log({ error });
             throw new CustomError("An error occurred. Please attempt again later.", 500)
         }
     }
