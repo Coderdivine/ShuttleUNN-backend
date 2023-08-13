@@ -10,7 +10,7 @@ const { useAi } = require("../utils/ai");
 
 class PostureService {
 
-  async addPosture({ user_id, devsensor_id, posture_name, posture_accuracy, posture_rate, date }){
+  async addPosture({ user_id, devsensor_id, posture_name, posture_accuracy, posture_rate }){
     try {
         const user = await User.findOne({ user_id });
         if(!user.isLinked) throw new CustomError("Please associate your devSensor ID to initiate tracking.", 400);
@@ -21,7 +21,6 @@ class PostureService {
               posture_name, 
               posture_accuracy, 
               posture_rate, 
-              date
         });
         const saved = await newPosture.save();
         return saved;

@@ -14,6 +14,17 @@ class WorkoutContoller {
         }
     }
 
+    async addPostures(req, res){
+        try {
+            if(!req.body) throw new CustomError("No request params passed.",400);
+            const result = await PostureService.addPosture(req.body);
+            if(!result) throw new CustomError("Oops! couldn't add posture",500);
+            res.status(201).send(response("Posture added.",result));
+        } catch (error) {
+            throw new CustomError("An error occurred. Please attempt again later.",500)
+        }
+    }
+
     async getUserPostures(req, res){
         try {
             if(!req.params) throw new CustomError("No request params passed.",400);
