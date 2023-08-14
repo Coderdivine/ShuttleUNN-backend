@@ -8,11 +8,17 @@ const openai = new OpenAIApi(configuration);
 
 async function useAi(prompt){
     try {
+
         const requestData = {
             prompt: prompt,
             max_tokens: 2000,
         };
-        const response = await openai.Completion.create(requestData);
+
+        const response = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: requestData.prompt }],
+        });
+        console.log({ response });
         console.log('Generated code:\n', response.choices[0].text);
         return {
             bool:true,
