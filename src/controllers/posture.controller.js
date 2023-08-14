@@ -41,7 +41,7 @@ class WorkoutContoller {
             if(!req.params) throw new CustomError("No request params passed.",400);
             const result = await PostureService.getUserPostures(req.params.user_id, req.params.timeInterval);
             if(!result) throw new CustomError("Oops! couldn't fetch postures",500);
-            res.status(201).send(response("Posture fetched.",result));
+            res.status(201).send(response("User posture fetched.",result));
         } catch (error) {
             throw new CustomError("An error occurred. Please attempt again later.",500)
         }
@@ -52,7 +52,7 @@ class WorkoutContoller {
             if(!req.body) throw new CustomError("No request body passed.",400);
             const result = await PostureService.getPostureSummaryOfTheDay(req.body.user_id);
             if(!result) throw new CustomError("Oops! couldn't fetch postures",500);
-            res.status(201).send(response("Posture fetched.",result));
+            res.status(201).send(response("Posture summary of the year.",result));
         } catch (error) {
             throw new CustomError("An error occurred. Please attempt again later.",500)
         }
@@ -63,7 +63,7 @@ class WorkoutContoller {
             if(!req.body) throw new CustomError("No request body passed.",400);
             const result = await PostureService.getPostureSummaryOfTheWeek(req.body.user_id);
             if(!result) throw new CustomError("Oops! couldn't fetch postures",500);
-            res.status(201).send(response("Posture fetched.",result));
+            res.status(201).send(response("Posture summary of the year.",result));
         } catch (error) {
             throw new CustomError("An error occurred. Please attempt again later.",500)
         }
@@ -74,18 +74,7 @@ class WorkoutContoller {
             if(!req.body) throw new CustomError("No request body passed.",400);
             const result = await PostureService.getPostureSummaryOfTheMonth(req.body.user_id);
             if(!result) throw new CustomError("Oops! couldn't fetch postures",500);
-            res.status(201).send(response("Posture fetched.",result));
-        } catch (error) {
-            throw new CustomError("An error occurred. Please attempt again later.",500)
-        }
-    }
-
-    async getPostureSummaryOfTheMonth(req, res){
-        try {
-            if(!req.body) throw new CustomError("No request body passed.",400);
-            const result = await PostureService.getPostureSummaryOfTheMonth(req.body.user_id);
-            if(!result) throw new CustomError("Oops! couldn't fetch postures",500);
-            res.status(201).send(response("Posture fetched.",result));
+            res.status(201).send(response("Postutre Summary of the month.",result));
         } catch (error) {
             throw new CustomError("An error occurred. Please attempt again later.",500)
         }
@@ -96,7 +85,18 @@ class WorkoutContoller {
             if(!req.body) throw new CustomError("No request body passed.",400);
             const result = await PostureService.getPostureSummaryOfTheYear(req.body.user_id);
             if(!result) throw new CustomError("Oops! couldn't fetch postures",500);
-            res.status(201).send(response("Posture fetched.",result));
+            res.status(201).send(response("Posture summary of the year.",result));
+        } catch (error) {
+            throw new CustomError("An error occurred. Please attempt again later.",500)
+        }
+    }
+
+    async getPostureSummaryOfTheYear(req, res){
+        try {
+            if(!req.body) throw new CustomError("No request body passed.",400);
+            const result = await PostureService.getPostureSummaryOfTheYear(req.body.user_id);
+            if(!result) throw new CustomError("Oops! couldn't fetch postures",500);
+            res.status(201).send(response("Posture summary.",result));
         } catch (error) {
             throw new CustomError("An error occurred. Please attempt again later.",500)
         }
@@ -107,7 +107,7 @@ class WorkoutContoller {
             if(!req.body) throw new CustomError("No request body passed.",400);
             const result = await PostureService.lastSixPosturesImage(req.body.user_id);
             if(!result) throw new CustomError("Oops! couldn't fetch postures",500);
-            res.status(201).send(response("Posture fetched.",result));
+            res.status(201).send(response("Last six postures fetched.",result));
         } catch (error) {
             throw new CustomError("An error occurred. Please attempt again later.",500)
         }
@@ -118,7 +118,7 @@ class WorkoutContoller {
             if(!req.body) throw new CustomError("No request body passed.",400);
             const result = await PostureService.fiveCommonPostures(req.body.user_id, req.body.period);
             if(!result) throw new CustomError("Oops! couldn't fetch postures",500);
-            res.status(201).send(response("Posture fetched.",result));
+            res.status(201).send(response("Five common posture fetched.",result));
         } catch (error) {
             throw new CustomError("An error occurred. Please attempt again later.",500)
         }
@@ -138,7 +138,7 @@ class WorkoutContoller {
         try {
             const result = await PostureService.predictWorkout(req.body.user_id, req.body.period);
             if(!result) throw new CustomError("An error occurred. Please attempt again later.", 400)
-            res.status(201).send(response("Posture fetched.",result));
+            res.status(201).send(response("Predicted workout.",result));
         } catch (error) {
             throw new CustomError("An error occurred. Please attempt again later.", 500);
         }
