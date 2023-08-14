@@ -233,55 +233,60 @@ class PostureService {
     return postures;
   }
 
-  async fiveCommonPostures(user_id, timePeriod) {
-    let startDate, endDate;
+  async fiveCommonPostures(user_id, timePeriod) { 
+      try{
+        let startDate, endDate;
 
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
-
-    if (timePeriod === "day") {
-      startDate = new Date(
-        currentDate.getFullYear(),
-        currentMonth,
-        currentDate.getDate()
-      );
-      endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + 1);
-    } else if (timePeriod === "month") {
-      startDate = new Date(currentYear, currentMonth, 1);
-      endDate = new Date(currentYear, currentMonth + 1, 0);
-    } else if (timePeriod === "year") {
-      startDate = new Date(currentYear, 0, 1);
-      endDate = new Date(currentYear + 1, 0, 1);
-    } else {
-      throw new Error("Invalid time period");
-    }
-
-    const postures = await Posture.aggregate([
-      {
-        $match: {
-          user_id: user_id,
-          date: { $gte: startDate, $lt: endDate },
-        },
-      },
-      {
-        $group: {
-          _id: "$posture_name",
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $sort: {
-          count: -1,
-        },
-      },
-      {
-        $limit: 5,
-      },
-    ]);
-
-    return postures;
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth();
+    
+        if (timePeriod === "day") {
+          startDate = new Date(
+            currentDate.getFullYear(),
+            currentMonth,
+            currentDate.getDate()
+          );
+          endDate = new Date(startDate);
+          endDate.setDate(endDate.getDate() + 1);
+        } else if (timePeriod === "month") {
+          startDate = new Date(currentYear, currentMonth, 1);
+          endDate = new Date(currentYear, currentMonth + 1, 0);
+        } else if (timePeriod === "year") {
+          startDate = new Date(currentYear, 0, 1);
+          endDate = new Date(currentYear + 1, 0, 1);
+        } else {
+          throw new Error("Invalid time period");
+        }
+    
+        const postures = await Posture.aggregate([
+          {
+            $match: {
+              user_id: user_id,
+              date: { $gte: startDate, $lt: endDate },
+            },
+          },
+          {
+            $group: {
+              _id: "$posture_name",
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $sort: {
+              count: -1,
+            },
+          },
+          {
+            $limit: 5,
+          },
+        ]);
+    
+        return postures;
+      } catch(error){
+          console.log(error.message);
+          throw new CustomError("An error occured. Please ty again later.",500)
+      }
   }
 
   
