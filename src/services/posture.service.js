@@ -323,7 +323,7 @@ class PostureService {
           startDate = new Date(currentDate.getFullYear(), 0, 1);
           endDate = new Date(currentDate.getFullYear() + 1, 0, 1);
         } else {
-          throw new Error('Invalid period');
+          throw new CustomError('Invalid period', 400);
         }
       
         const postures = await Posture.find(
