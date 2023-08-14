@@ -284,7 +284,6 @@ class PostureService {
     
         return postures;
       } catch(error){
-          console.log(error.message);
           throw new CustomError("An error occured. Please ty again later.",500)
       }
   }
@@ -365,6 +364,7 @@ class PostureService {
       
         return suggestedWorkouts;
     } catch (error) {
+      console.log({ error })
         throw new CustomError(
             "An error occurred. Please attempt again later.",
             500
