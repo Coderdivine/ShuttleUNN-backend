@@ -2,6 +2,7 @@ const router = require("express").Router();
 const auth = require("../middlewares/auth.middleware")();
 const DeviceCtrl = require("../controllers/device.controller");
 
+router.get("/device-details", DeviceCtrl.getDeviceDetails);
 router.get("/wifi-strength", DeviceCtrl.getWifiStrength);
 router.get("/battery-level", DeviceCtrl.getBatteryLevel);
 router.get("/battery-health", DeviceCtrl.getBatteryHealth);

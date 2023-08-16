@@ -5,6 +5,16 @@ const CustomError = require("../utils/custom-error");
 
 class DeviceService {
 
+  async getDeviceDetails({ devsensor_id }) {
+    try {
+        const device = await Device.findOne({ devsensor_id });
+        if(!device) throw new CustomError("Device not activated yet.", 400);
+        return device;
+    } catch (error) {
+        throw new CustomError("An error occured. Please ty again later.",500)
+    }
+  } 
+
   async getWifiStrength({ devsensor_id, wifi_strength }) {
         try {
             const device = await Device.findOne({ devsensor_id });

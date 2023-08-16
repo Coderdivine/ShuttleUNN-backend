@@ -4,6 +4,20 @@ const CustomError = require("../utils/custom-error");
 
 class UserContoller {
 
+    async getDeviceDetails(req, res) {
+        try {
+            if (!req.params) throw new CustomError("No parameter passed.", 400);
+            const result = await DeviceService.getDeviceDetails({ devsensor_id: req.params.devsensor_id });
+            if(!result) throw new CustomError("No result returned. Please make sure your device is activated.", 400);
+            res.status(200).send(response("Wifi strength detected", result));
+        } catch (error) {
+            throw new CustomError(
+                "An issue has arisen. Please try again later.",
+                500
+              );
+        }
+    }
+
   async getWifiStrength(req, res) {
     try {
       if (!req.params) throw new CustomError("No parameter passed.", 400);
@@ -163,7 +177,7 @@ class UserContoller {
       );
     }
   }
-  
+
 }
 
 module.exports = new UserContoller();
