@@ -8,7 +8,6 @@ const openai = new OpenAIApi(configuration);
 
 async function useAi(prompt){
     try {
-
         const requestData = {
             prompt: prompt,
             max_tokens: 2000,
