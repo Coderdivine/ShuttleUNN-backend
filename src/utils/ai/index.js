@@ -32,4 +32,6 @@ async function useAi(prompt){
       }
 }
 
-module.exports = { useAi };
+module.exports = { 
+    useAi
+ };
