@@ -1,19 +1,16 @@
 const { BCRYPT_SALT } = require("../config");
 const User = require("../models/user.model");
-const Billing = require("../models/billing.model");
-const VToken = require("../models/vtoken.model");
+const Device = require("../models/device.model");
 const CustomError = require("../utils/custom-error");
-const bcrypt = require("bcrypt");
-const uuid = require("uuid");
-const randonNum = require("../utils/randonNum");
-const { sendMail, resetPassword } = require("../utils/sendMail");
 
 class DeviceService {
 
   async getWifiStrength({ devsensor_id, wifi_strength }) {
         try {
-            const user = await User.findOne({ devsensor_id });
-            if(!user) throw new CustomError("User disabled.", 400);
+            const device = await Device.findOne({ devsensor_id });
+            if(!device) throw new CustomError("Device not available.", 400);
+            device.wifi_strength = wifi_strength;
+            await device.save();
             return wifi_strength;
         } catch (error) {
             throw new CustomError("An error occured. Please ty again later.",500)
@@ -22,8 +19,10 @@ class DeviceService {
 
   async getBatteryLevel({ devsensor_id, battery_level }) {
         try {
-            const user = await User.findOne({ devsensor_id });
-            if(!user) throw new CustomError("User disabled.", 400);
+            const device = await Device.findOne({ devsensor_id });
+            if(!device) throw new CustomError("Device not activated.", 400);
+            device.battery_level = battery_level;
+            await device.save();
             return battery_level;  
         } catch (error) {
             throw new CustomError("An error occured. Please ty again later.",500)
@@ -32,8 +31,10 @@ class DeviceService {
 
   async getBatteryHealth({ devsensor_id, battery_health }) {
         try {
-            const user = await User.findOne({ devsensor_id });
-            if(!user) throw new CustomError("User disabled.", 400);
+            const device = await Device.findOne({ devsensor_id });
+            if(!device) throw new CustomError("Device not activated.", 400);
+            device.battery_health = battery_health;
+            await device.save();
             return battery_health;  
         } catch (error) {
             throw new CustomError("An error occured. Please ty again later.",500)
@@ -42,8 +43,10 @@ class DeviceService {
 
   async getDevicehealth({ devsensor_id, device_health }) {
         try {
-            const user = await User.findOne({ devsensor_id });
-            if(!user) throw new CustomError("User disabled.", 400);
+            const device = await Device.findOne({ devsensor_id });
+            if(!device) throw new CustomError("Device not activated.", 400);
+            device.device_health = device_health;
+            await device.save();
             return device_health;  
         } catch (error) {
             throw new CustomError("An error occured. Please ty again later.",500)
@@ -52,8 +55,10 @@ class DeviceService {
 
   async getDeviceMemory({ devsensor_id, device_memory }) {
         try {
-            const user = await User.findOne({ devsensor_id });
-            if(!user) throw new CustomError("User disabled.", 400);
+            const device = await Device.findOne({ devsensor_id });
+            if(!device) throw new CustomError("Device not activated.", 400);
+            device.device_memory = device_memory;
+            await device.save();
             return device_memory; 
         } catch (error) {
             throw new CustomError("An error occured. Please ty again later.",500)
@@ -62,8 +67,10 @@ class DeviceService {
 
   async getDeviceAge({ devsensor_id, device_age }) {
         try {
-            const user = await User.findOne({ devsensor_id });
-            if(!user) throw new CustomError("User disabled.", 400);
+            const device = await Device.findOne({ devsensor_id });
+            if(!device) throw new CustomError("Device not activated.", 400);
+            device.device_age = device_age;
+            await device.save();
             return device_age; 
         } catch (error) {
             throw new CustomError("An error occured. Please ty again later.",500)
@@ -96,7 +103,7 @@ class DeviceService {
   async trackFrequency({ devsensor_id, frequency }) {
         try {
             const user = await User.findOne({ devsensor_id });
-            if(!user) throw new CustomError("User disabled.", 400);
+            if(!user) throw new CustomError("Device not activated.", 400);
             const checkFrequency = await this.checkFrequency(frequency);
             if(!checkFrequency.bool) throw new CustomError((checkFrequency).message, 400);
             user.track_frequency = frequency;
@@ -110,7 +117,7 @@ class DeviceService {
   async disableDevice({ devsensor_id }) {
         try {
             const user = await User.findOne({ devsensor_id });
-            if(!user) throw new CustomError("User disabled.", 400);
+            if(!user) throw new CustomError("Device not activated.", 400);
             user.isLinked = false;
             await user.save();
             return { message: "Device disabled" }
@@ -122,7 +129,7 @@ class DeviceService {
   async enableDevice({ devsensor_id }) {
         try {
             const user = await User.findOne({ devsensor_id });
-            if(!user) throw new CustomError("User disabled.", 400);
+            if(!user) throw new CustomError("Device not activated.", 400);
             user.isLinked = true;
             await user.save();
             return { message: "Device Enabled" }
