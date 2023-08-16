@@ -1,5 +1,6 @@
 const { BCRYPT_SALT } = require("../config");
 const User = require("./../models/user.model");
+const Device = require("./../models/device.model");
 const Billing = require("./../models/billing.model");
 const VToken = require("./../models/vtoken.model");
 const CustomError = require("./../utils/custom-error");
@@ -20,15 +21,22 @@ class UserService {
       throw new CustomError(
         "Oops! Email already registered. Please choose another one."
       );
+    const devsensor_id = uuid.v4().toString();
     const newUser = new User({
       email: data.email,
       user_id,
+      devsensor_id,
       username: `${data.email.split("@")[0]}` || "",
       password: hash,
     });
+    const newDevice = new Device({
+        user_id,
+        devsensor_id
+    });
     const saved = await newUser.save();
-    if (!saved)
-      throw new CustomError("Unable to Register email, Please try again");
+    const new_d_saved = await newDevice.save();
+    if (!saved || !new_d_saved)
+      throw new CustomError("Unable to Register user, Please try again");
     await this.sendEmail({ email: data.email });
     console.log({ saved });
     saved.password = "";
