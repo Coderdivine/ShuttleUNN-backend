@@ -93,6 +93,10 @@ const UserSchema = new Schema(
       type:Boolean,
       default:false
     },
+    track_frequency:{
+        type:String,
+        default:60
+    },
     initialAuthentication:{
       type:String,
       default:"devsensor"
