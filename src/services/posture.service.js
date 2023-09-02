@@ -376,7 +376,9 @@ class PostureService {
     try {
 
         const workouts = await this.listWorkouts();
+        console.log({ workouts });
         const prompt = await this.generatePromptForPostures(postureType, postures);
+        console.log({ prompt })
         const response = await useAi(prompt);
         const suggestedWorkoutIds = response.message.choices[0].text.split(',');
         return suggestedWorkoutIds.map(suggestedId => workouts.find(w => w.workout_id === suggestedId)).filter(workout => workout);

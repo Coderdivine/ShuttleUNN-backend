@@ -6,11 +6,13 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 
+
 async function useAi(prompt){
     try {
+
         const requestData = {
             prompt: prompt,
-            max_tokens: 2000,
+            max_tokens: 200,
         };
 
         const response = await openai.createChatCompletion({
@@ -24,7 +26,7 @@ async function useAi(prompt){
             message: response.choices[0].text
         }
       } catch (error) {
-        console.error('OpenAI API Error:', error.message);
+        console.log({ error })
         return {
             bool:false,
             message: error.message
