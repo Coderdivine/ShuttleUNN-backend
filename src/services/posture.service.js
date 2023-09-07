@@ -360,8 +360,7 @@ class PostureService {
     
         if (goodPostures.length > 0) {
           suggestedWorkouts.push(...await this.suggestWorkouts('good', goodPostures));
-        }
-      
+        }      
         return suggestedWorkouts;
     } catch (error) {
       console.log({ error })
@@ -376,13 +375,14 @@ class PostureService {
     try {
 
         const workouts = await this.listWorkouts();
-        console.log({ workouts });
         const prompt = await this.generatePromptForPostures(postureType, postures);
-        console.log({ prompt })
-        const response = await useAi(prompt);
-        const suggestedWorkoutIds = response.message.choices[0].text.split(',');
-        return suggestedWorkoutIds.map(suggestedId => workouts.find(w => w.workout_id === suggestedId)).filter(workout => workout);
-     
+        const { bool, message } = await useAi(prompt);
+        if(!bool) throw new CustomError("Please try again later", 400);
+        const suggestedWorkoutIds = message.split(',');
+        console.log({ suggestedWorkoutIds });
+        const uniqueWorkoutIds = [...new Set(suggestedWorkoutIds)];
+        const response_array = await uniqueWorkoutIds.map(suggestedId => workouts.find(w => w.workout_id === this.useRegex(suggestedId))).filter(workout => workout);
+        return response_array;
     } catch (error) {
         throw new CustomError(
             "An error occurred. Please attempt again later.",
@@ -392,8 +392,19 @@ class PostureService {
  }
   
   async generatePromptForPostures(postureType, postures) {
-    const postureData = postures.map(posture => `("${posture.posture_name}", "${posture.posture_accuracy}")`);
-    return `Suggest ${postureType} posture workouts based on: ${postureData.join(',')}`;
+    const postureData = postures.map(posture => `(Workout id:"${posture.posture_id}," Workout name: "${posture.posture_name}", " Workout Accuracy: ${posture.posture_accuracy}")`);
+    const workoutData = (await Workout.find({})).map(workout => `(Workout id:"${workout.workout_id}," Workout title: "${workout.title}", " Workout description: ${workout.description}")`);
+    return `Suggest 4 ${postureType} posture workouts based on this postures: ${postureData.join(',')}, and return workout_ids as response from this workouts: ${workoutData.join(',')}. Separate workout_ids by commas (","), return the ids only without texts for example: 12345,12345,12345,12345`;
+  }
+
+  useRegex(str){
+    const regexPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'$/;
+    const match = regexPattern.exec(str);
+    if (match) {
+      const validFormatString = match[0];
+      return validFormatString;
+    }
+    return str;
   }
 
 }
