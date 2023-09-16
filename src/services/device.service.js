@@ -167,6 +167,7 @@ class DeviceService {
             throw new CustomError("An error occured. Please ty again later.",500)
         }
   }
+  
 }
 
 module.exports = new DeviceService();
