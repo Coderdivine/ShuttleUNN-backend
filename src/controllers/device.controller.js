@@ -18,6 +18,19 @@ class UserContoller {
         }
     }
 
+    async updateDevice(req, res) {
+      try {
+            const result = await DeviceService.updateDevice(req.body.devsensor_id, req.body)
+            if(!result) throw new CustomError("No result returned. Please make sure your device is activated.", 400);
+            res.status(200).send(response("Device Updated.", result));
+      } catch (error) {
+        throw new CustomError(
+          "An issue has arisen. Please try again later.",
+          500
+        );
+      }
+    }
+
   async getWifiStrength(req, res) {
     try {
       if (!req.params) throw new CustomError("No parameter passed.", 400);

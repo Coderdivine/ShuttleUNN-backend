@@ -15,6 +15,16 @@ class DeviceService {
     }
   } 
 
+  async updateDevice(devsensor_id, data) {
+    try {
+        const device = await Device.updateOne({ devsensor_id }, { $set: data });
+        if (!device) throw new CustomError("Device does not exist", 404);
+        return device;
+    } catch (error) {
+        throw new CustomError("An error occured. Please ty again later.",500)
+    }
+  }
+
   async getWifiStrength({ devsensor_id, wifi_strength }) {
         try {
             const device = await Device.findOne({ devsensor_id });
