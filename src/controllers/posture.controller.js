@@ -2,7 +2,7 @@ const response = require("../utils/response");
 const PostureService = require("../services/posture.service");
 const CustomError = require("../utils/custom-error");
 
-class WorkoutContoller {
+class PostureController {
 
     async linkDevSensorId(req, res){
         try {
@@ -146,4 +146,4 @@ class WorkoutContoller {
 
 }
 
-module.exports = new WorkoutContoller();
+module.exports = new PostureController();

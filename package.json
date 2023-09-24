@@ -43,6 +43,7 @@
     "request": "^2.88.2",
     "sharp": "^0.32.1",
     "stream": "^0.0.2",
+    "unique-username-generator": "^1.2.0",
     "uuid": "^9.0.0",
     "xlsx-populate": "^1.21.0"
   },

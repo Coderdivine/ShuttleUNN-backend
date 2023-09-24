@@ -2,7 +2,7 @@ const response = require("../utils/response");
 const DeviceService = require("../services/device.service");
 const CustomError = require("../utils/custom-error");
 
-class UserContoller {
+class DeviceController {
 
     async getDeviceDetails(req, res) {
         try {
@@ -193,4 +193,4 @@ class UserContoller {
 
 }
 
-module.exports = new UserContoller();
+module.exports = new DeviceController();
