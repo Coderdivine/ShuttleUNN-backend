@@ -139,7 +139,6 @@ class UserService {
   }
 
   async suspendAccount(user_id) {
-    try {
       if (!user_id)
         throw new CustomError(
           "Kindly log in once more to finalize this attempt.",
@@ -149,16 +148,9 @@ class UserService {
       user_account.isSuspended = true;
       const saved = await user_account.save();
       return saved;
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
   }
 
   async realeaseAccount(user_id) {
-    try {
       if (!user_id)
         throw new CustomError(
           "Kindly log in once more to finalize this attempt.",
@@ -167,18 +159,11 @@ class UserService {
       const user_account = await User.findOne({ user_id });
       user_account.isSuspended = false;
       const saved = await user_account.save();
-      return saved;
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
+   
   }
 
 
   async userBilling(user_id) {
-    try {
       if (!user_id)
         throw new CustomError(
           "Kindly log in once more to finalize this attempt.",
@@ -186,17 +171,10 @@ class UserService {
         );
       const user_bills = await Billing.find({ user_id });
       return user_bills;
-    } catch (error) {
-      console.log(error);
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
+    
   }
 
   async addToUserbilling(user_id, data) {
-    try {
       if (!user_id)
         throw new CustomError(
           "Kindly log in once more to finalize this attempt.",
@@ -216,17 +194,10 @@ class UserService {
       const saved = await newBilling.save();
       console.log({ saved });
       return saved;
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
   }
 
 
   async getUserRoutine(user_id) {
-    try {
       if (!user_id)
         throw new CustomError(
           "Kindly log in once more to finalize this attempt.",
@@ -235,16 +206,9 @@ class UserService {
       const user_routine = await User.findOne({ user_id });
       const routine = user_routine.dailyRoutine;
       return routine;
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
   }
 
   async addToUserRoutine(user_id, routine_name, time) {
-    try {
 
       if (!user_id)
         throw new CustomError(
@@ -265,16 +229,10 @@ class UserService {
       );
 
       return saved;
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
+   
   }
 
   async editUserRoutine(user_id, routine_id, updatedValue, updatedField) {
-    try {
       if (!user_id)
         throw new CustomError(
           "Kindly log in once more to finalize this attempt.",
@@ -288,18 +246,10 @@ class UserService {
         { user_id: user_id, 'dailyRoutine.routine_id': routine_id },
         { $set: updateQuery }
         )
-        return edited;
-
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
+        return edited
   }
 
   async deleteFromUserRoutine(user_id, routine_id) {
-    try {
       if (!user_id)
         throw new CustomError(
           "Kindly log in once more to finalize this attempt.",
@@ -312,13 +262,6 @@ class UserService {
         )
 
         return deleted;
-
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
   }
 
 

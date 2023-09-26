@@ -9,29 +9,19 @@ const randonNum = require("../utils/randonNum");
 class WorkoutService {
 
   async getWorkouts(){
-    try {
        const workouts = await Workout.find({});
        return workouts.map((x, key)=>{ return { workout_id:x.workout_id, internals:x.workouts.map(e=>{ return { ex:e.name, id:e.identity }})}});
-    } catch (error) {
-      throw new CustomError("An issue has arisen. Please try again later.",500);
-    }
+
   }
 
   async getWorkout( workout_id ){
-    try {
         const workout = await Workout.findOne({ workout_id });
         if(!workout) throw new CustomError("This workout no longer exists.",400);
         return workout;
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
+
   }
 
   async addWorkout(data){
-    try {
       if (!data)
         throw new CustomError(
           "No data passed.",
@@ -49,12 +39,7 @@ class WorkoutService {
         const saved = await newWorkout.save();
         return saved;
 
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
+
   }
 
   async deleteWorkout(workout_id) {
@@ -63,17 +48,13 @@ class WorkoutService {
   }
 
   async updateWorkout(workout_id, data) {
-      try {
-        const workout = await Workout.updateOne({ workout_id }, { $set: data });
+          const workout = await Workout.updateOne({ workout_id }, { $set: data });
         if (!workout) throw new CustomError("Workout does not exist.", 404);
         return workout;
-      } catch (error) {
-         throw new CustomError("An issue has arisen, Please try again later",500);
-      }
+ 
   }
 
   async saveWorkout(user_id, { workout_id, title, description, timeRange, media }) {
-    try {
 
       if (!user_id)
         throw new CustomError(
@@ -95,16 +76,10 @@ class WorkoutService {
       );
 
       return saved;
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
+
   }
 
   async addNewWorkoutInWorkouts(workout_id, { description, timeRange, media, name }){
-    try {
       const newWorkout = {
         identity:uuid.v4().toString(),
         name,
@@ -119,16 +94,10 @@ class WorkoutService {
       );
 
       return saved;
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
+
   }
 
   async editWorkoutInWorkouts(workout_id, identity, updatedValue, updatedField) {
-    try {
       if (!workout_id)
         throw new CustomError("Workout does not exist.", 400);
   
@@ -146,14 +115,10 @@ class WorkoutService {
       );
   
       return edited;
-    } catch (error) {
-      throw new CustomError("An issue has arisen. Please try again later.", 500);
-    }
   }
   
 
   async deleteFromWorkoutInWorkouts(workout_id, identity) {
-    try {
       if (!workout_id)
         throw new CustomError(
           "Workout does not exist",
@@ -167,12 +132,7 @@ class WorkoutService {
 
         return deleted;
 
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
-      );
-    }
+
   }
 
 

@@ -11,20 +11,16 @@ const { useAi } = require("../utils/ai");
 class PostureService {
 
   async linkDevSensorId({ user_id, devsensor_id }){
-        try {
            const user = await User.findOne({ user_id });
            if(!user) throw new CustomError("User details not found", 400);
           if(user.devsensor_id !== devsensor_id) throw new CustomError("Please insert the right devSensor ID.", 400);
           user.isLinked = true;
           const saved = await user.save();
           return saved;
-        } catch (error) {
-          throw new CustomError("An error occurred. Please attempt again later.", 500);
-        }
+
   }
 
   async addPosture({ user_id, devsensor_id, posture_name, posture_accuracy, posture_rate }){
-    try {
         const user = await User.findOne({ user_id });
         if(!user.isLinked) {
           throw new CustomError("Please associate your devSensor ID to initiate tracking.", 400);
@@ -39,35 +35,20 @@ class PostureService {
         });
         const saved = await newPosture.save();
         return saved;
-    } catch (error) {
-      console.log({ error })
-      throw new CustomError("An error occurred. Please attempt again later.", 500);
-    }
+ 
   }
 
   async getAllPostures() {
-    try {
       const posture = await Posture.find({});
       return posture;
-    } catch (error) {
-      throw new CustomError(
-        "An error occurred. Please attempt again later.",
-        500
-      );
-    }
+ 
   }
 
   async getUserPostures(user_id, timeInterval) {
-    try {
       console.log({ timeInterval });
       const posture = await Posture.find({ user_id });
       return posture;
-    } catch (error) {
-      throw new CustomError(
-        "An error occurred. Please attempt again later.",
-        500
-      );
-    }
+ 
   }
 
 
@@ -79,7 +60,6 @@ class PostureService {
   }
 
   async getPostureSummaryOfTheDay(user_id) {
-    try {
       const currentDate = new Date();
       const startOfDay = new Date(
         currentDate.getFullYear(),
@@ -103,16 +83,10 @@ class PostureService {
           400
         );
       return message;
-    } catch (error) {
-      throw new CustomError(
-        "An error occurred. Please attempt again later.",
-        500
-      );
-    }
+ 
   }
 
   async getPostureSummaryOfTheWeek(user_id) {
-    try {
       const currentDate = new Date();
       const startOfWeek = new Date(currentDate);
       startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
@@ -133,16 +107,10 @@ class PostureService {
           400
         );
       return message;
-    } catch (error) {
-      throw new CustomError(
-        "An error occurred. Please attempt again later.",
-        500
-      );
-    }
+ 
   }
 
   async getPostureSummaryOfTheMonth(user_id) {
-    try {
       const currentDate = new Date();
       const startOfMonth = new Date(
         currentDate.getFullYear(),
@@ -169,16 +137,10 @@ class PostureService {
           400
         );
       return message;
-    } catch (error) {
-      throw new CustomError(
-        "An error occurred. Please attempt again later.",
-        500
-      );
-    }
+ 
   }
 
   async getPostureSummaryOfTheYear(user_id) {
-    try {
       const currentYear = new Date().getFullYear();
       const startOfYear = new Date(currentYear, 0, 1);
       const endOfYear = new Date(currentYear + 1, 0, 1);
@@ -197,12 +159,7 @@ class PostureService {
           400
         );
       return message;
-    } catch (error) {
-      throw new CustomError(
-        "An error occurred. Please attempt again later.",
-        500
-      );
-    }
+ 
   }
 
 
@@ -234,7 +191,6 @@ class PostureService {
   }
 
   async fiveCommonPostures(user_id, timePeriod) { 
-      try{
         let startDate, endDate;
 
         const currentDate = new Date();
@@ -283,27 +239,16 @@ class PostureService {
         ]);
     
         return postures;
-      } catch(error){
-          throw new CustomError("An error occured. Please ty again later.",500)
-      }
+
   }
 
   
   async listWorkouts() {
-    try {
         const workouts = await Workout.find({}, { title: 1, workout_id: 1, _id: 0 });
         return workouts;
-    } catch (error) {
-        console.log(error.message);
-        throw new CustomError(
-            "An error occurred. Please attempt again later.",
-            500
-          );  
-    }
   }
 
   async groupPosturesByPeriod(user_id, period) {
-    try {
         const currentDate = new Date();
         let startDate, endDate;
       
@@ -341,17 +286,11 @@ class PostureService {
         const goodPostures = postures.filter(posture => posture.posture_accuracy >= 50 && posture.posture_accuracy <= 99);
       
         return { badPostures, goodPostures };
-    } catch (error) {
-        throw new CustomError(
-            "An error occurred. Please attempt again later.",
-            500
-          );
-    }
+ 
 
   }
   
   async predictWorkout(user_id, period) {
-    try {
         const { badPostures, goodPostures } = await this.groupPosturesByPeriod(user_id, period);
         const suggestedWorkouts = [];
         if (badPostures.length > 0) {
@@ -362,17 +301,10 @@ class PostureService {
           suggestedWorkouts.push(...await this.suggestWorkouts('good', goodPostures));
         }      
         return suggestedWorkouts;
-    } catch (error) {
-      console.log({ error })
-        throw new CustomError(
-            "An error occurred. Please attempt again later.",
-            500
-          );
-    }
+   
   }
 
   async suggestWorkouts(postureType, postures) {
-    try {
 
         const workouts = await this.listWorkouts();
         const prompt = await this.generatePromptForPostures(postureType, postures);
@@ -383,12 +315,7 @@ class PostureService {
         const uniqueWorkoutIds = [...new Set(suggestedWorkoutIds)];
         const response_array = await uniqueWorkoutIds.map(suggestedId => workouts.find(w => w.workout_id === this.useRegex(suggestedId))).filter(workout => workout);
         return response_array;
-    } catch (error) {
-        throw new CustomError(
-            "An error occurred. Please attempt again later.",
-            500
-          );
-    }
+ 
  }
   
   async generatePromptForPostures(postureType, postures) {

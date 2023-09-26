@@ -7,7 +7,6 @@ const { sendWaitListMessage } = require("../utils/sendWaitListMessage");
 class WaitListService {
 
   async joinWaitList({ email }) {
-    try {
         console.log({ email });
       const waitlist = await WaitList.findOne({ email });
       if (waitlist)
@@ -21,14 +20,10 @@ class WaitListService {
       });
       const savedMember = await addMember.save();
       return savedMember;
-    } catch (error) {
-        console.log({ error })
-      throw new CustomError("An error occured. Please ty again later.", 500);
-    }
+   
   }
 
   async sendMessage({ email, message }) {
-    try {
       console.log({ email, message })
       const wailListmember = await WaitList.findOne({ email });
       if (!wailListmember) { throw new CustomError("Please join our waitlist first.") };
@@ -39,11 +34,7 @@ class WaitListService {
       return {
         message: "Message sent.",
       };
-    } 
-    catch (error) {
-      console.log({ error });
-      throw new CustomError("An error occured. Please ty again later.", 500);
-    }
+    
   }
 }
 
