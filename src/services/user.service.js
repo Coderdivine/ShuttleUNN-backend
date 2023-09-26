@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 const uuid = require("uuid");
 const randonNum = require("../utils/randonNum");
 const { sendMail, resetPassword } = require("../utils/sendMail");
+const { genDevSensorID } = require("../utils/genDevID");
 
 class UserService {
 
@@ -21,7 +22,8 @@ class UserService {
       throw new CustomError(
         "Oops! Email already registered. Please choose another one."
       );
-    const devsensor_id = uuid.v4().toString();
+    const devsensor_id = genDevSensorID(data.email);
+    console.log({ devsensor_id });
     const newUser = new User({
       email: data.email,
       user_id,

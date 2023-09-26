@@ -11,7 +11,7 @@ class WorkoutService {
   async getWorkouts(){
     try {
        const workouts = await Workout.find({});
-       return workouts;
+       return workouts.map((x, key)=>{ return { workout_id:x.workout_id, internals:x.workouts.map(e=>{ return { ex:e.name, id:e.identity }})}});
     } catch (error) {
       throw new CustomError("An issue has arisen. Please try again later.",500);
     }
@@ -130,27 +130,27 @@ class WorkoutService {
   async editWorkoutInWorkouts(workout_id, identity, updatedValue, updatedField) {
     try {
       if (!workout_id)
-        throw new CustomError(
-          "Workout does not exist.",
-          400
-        );
-
-        const updateQuery = {};
-        updateQuery[`dailyRoutine.$.${updatedField}`] = updatedValue;
-
-        const edited = await Workout.updateOne(
-        { workout_id: workout_id, 'workouts.identity': identity },
-        { $set: updateQuery }
-        )
-        return edited;
-
-    } catch (error) {
-      throw new CustomError(
-        "An issue has arisen. Please try again later.",
-        500
+        throw new CustomError("Workout does not exist.", 400);
+  
+      const updateQuery = {};
+      updateQuery[`workouts.$[elem].${updatedField}`] = updatedValue;
+  
+      const edited = await Workout.updateOne(
+        { workout_id: workout_id },
+        {
+          $set: updateQuery,
+        },
+        {
+          arrayFilters: [{ 'elem.identity': identity }],
+        }
       );
+  
+      return edited;
+    } catch (error) {
+      throw new CustomError("An issue has arisen. Please try again later.", 500);
     }
   }
+  
 
   async deleteFromWorkoutInWorkouts(workout_id, identity) {
     try {
