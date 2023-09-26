@@ -1,7 +1,7 @@
 const config = {
-    APP_NAME: "Axgura Mailing",
+    APP_NAME: "DevSensor.",
     JWT_SECRET: process.env.JWT_SECRET || "000-12345-000",
-    MONGODB_URI: process.env.MONGO_ATLAS_URI || "mongodb+srv://chimdi:chimdi@cluster0.5zspaed.mongodb.net/?retryWrites=true&w=majority",
+    MONGODB_URI: process.env.MONGO_ATLAS_URI || "mongodb://localhost:27017", // "mongodb+srv://chimdi:chimdi@cluster0.5zspaed.mongodb.net/?retryWrites=true&w=majority",
     BCRYPT_SALT: process.env.BCRYPT_SALT || 10,
     role: {
         USER: ["user", "admin"],
