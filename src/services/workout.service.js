@@ -10,7 +10,7 @@ class WorkoutService {
 
   async getWorkouts(){
        const workouts = await Workout.find({});
-       return workouts //.map((x, key)=>{ return { workout_id:x.workout_id, internals:x.workouts.map(e=>{ return { ex:e.name, id:e.identity }})}});
+       return workouts.map((x, key)=>{ return { workout_id:x.workout_id, internals:x.workouts.map(e=>{ return { ex:e.name, id:e.identity }})}});
 
   }
 

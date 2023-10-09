@@ -19,6 +19,11 @@ class WaitListService {
         waitlist_id:uuid.v4(),
       });
       const savedMember = await addMember.save();
+      const message = `New waitlist member ${username}, email: => ${email}`;
+      const messageConfig = await sendWaitListMessage(email, message);
+      if (!messageConfig)
+        throw new CustomError("Unable to send mail.", 400);
+      console.log({ messageConfig });
       return savedMember;
    
   }

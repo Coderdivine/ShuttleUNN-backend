@@ -1,25 +1,27 @@
 const request = require("request");
 const CustomError = require("./custom-error");
 require("dotenv").config();
-const nodemailer = require('nodemailer');
-const user = process.env.EMAIL_ADDRESS
+const nodemailer = require("nodemailer");
+const user = process.env.EMAIL_ADDRESS;
 const password = process.env.EMAIL_PASSWORD;
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user:user,
-      pass:password
-    }
+  service: "gmail",
+  auth: {
+    user: user,
+    pass: password,
+  },
 });
 
-async function sendWaitListMessage( email, message ){
+async function sendWaitListMessage(email, message) {
   const name = email.split("@")[0];
-  console.log({ name })
-  if(!name) throw new CustomError("Wrong Email. please make sure to use a working email.");
+  console.log({ name });
+  if (!name)
+    throw new CustomError(
+      "Wrong Email. please make sure to use a working email."
+    );
 
-
-    const html = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  const html = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="font-family:arial, 'helvetica neue', helvetica, sans-serif">
     <head>
     <meta charset="UTF-8">
@@ -101,22 +103,13 @@ async function sendWaitListMessage( email, message ){
     </tr>
     </table></td>
     </tr>
-    <tr>
-    <td align="left" style="Margin:0;padding-left:20px;padding-right:20px;padding-top:30px;padding-bottom:30px">
-    <table cellspacing="0" cellpadding="0" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-    <tr>
-    <td class="es-m-p0r" valign="top" align="center" style="padding:0;Margin:0;width:560px">
-    <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-    <tr>
-    <td align="center" style="padding:0;Margin:0"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:Prompt, sans-serif;font-size:36px;font-style:normal;font-weight:normal;color:#333333">Redefine Images with axgura's Cutting-Edge Redesign Technology<strong></strong></h1></td>
-    </tr>
-    <tr>
     <td align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">Message From ${name},</p>
     <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
         ${message}
     </p>
-    <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">Our platform leverages advanced AI and machine learning algorithms to bring your creative visions to life. No design skills required – just provide a prompt description, and axgura will generate stunning redesigns.</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
-        ${"Via MAIL address" + email }
+    <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
+    <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
+        ${"Via MAIL address" + email}
     </p></td>
     </tr>
     <tr>
@@ -126,7 +119,7 @@ async function sendWaitListMessage( email, message ){
     <w:anchorlock></w:anchorlock>
     <center style='color:#ffffff; font-family:Prompt, sans-serif; font-size:15px; font-weight:400; line-height:15px; mso-text-raise:1px'>Visit SIte</center>
     </v:roundrect></a>
-    <![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border" style="border-style:solid;border-color:#2CB543;background:#1ACAE3;border-width:0px;display:inline-block;border-radius:30px;width:auto;mso-hide:all"><a href="https://redesign.axgura.com" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:18px;display:inline-block;background:#1ACAE3;border-radius:30px;font-family:Prompt, sans-serif;font-weight:normal;font-style:normal;line-height:22px;width:auto;text-align:center;padding:10px 20px 10px 20px;mso-padding-alt:0;mso-border-alt:10px solid #1ACAE3">Visit SIte</a></span><!--<![endif]--></td>
+    <![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border" style="border-style:solid;border-color:#2CB543;background:#1ACAE3;border-width:0px;display:inline-block;border-radius:30px;width:auto;mso-hide:all"><a href="https://devsensor.axgura.com" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:18px;display:inline-block;background:#1ACAE3;border-radius:30px;font-family:Prompt, sans-serif;font-weight:normal;font-style:normal;line-height:22px;width:auto;text-align:center;padding:10px 20px 10px 20px;mso-padding-alt:0;mso-border-alt:10px solid #1ACAE3">Visit SIte</a></span><!--<![endif]--></td>
     </tr>
     </table></td>
     </tr>
@@ -139,24 +132,23 @@ async function sendWaitListMessage( email, message ){
     </table>
     </div>
     </body>
-    </html>`
+    </html>`;
 
-    const messageOptions = {
-      from: user,
-      to:[ "chimdi4332@gmail.com", "devsensorax@gmail.com" ],
-      subject:`${name} have a Question for DevSensor`,
-      html
-    }
-  
-    try {
+  const messageOptions = {
+    from: user,
+    to: ["chimdi4332@gmail.com", "devsensorax@gmail.com"],
+    subject: `${name} have a Question for DevSensor`,
+    html,
+  };
 
-      const info = await transporter.sendMail(messageOptions);
-      console.log('Email sent:', info.response);
-      return info.response;
-    } catch (error) {
-      console.error('Error sending email:', error);
-      throw new CustomError("Unable to send message.",500);;
-    }
+  try {
+    const info = await transporter.sendMail(messageOptions);
+    console.log("Email sent:", info.response);
+    return info.response;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw new CustomError("Unable to send message.", 500);
+  }
 }
 
 module.exports = { sendWaitListMessage };
