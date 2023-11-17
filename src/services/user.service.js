@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { BCRYPT_SALT } = require("../config");
 const User = require("./../models/user.model");
 const Device = require("./../models/device.model");
@@ -6,10 +7,13 @@ const VToken = require("./../models/vtoken.model");
 const CustomError = require("./../utils/custom-error");
 const bcrypt = require("bcrypt");
 const uuid = require("uuid");
+
+const passport = require("passport");
+const cookieSession = require("cookie-session");
+
 const randonNum = require("../utils/randonNum");
 const { sendMail, resetPassword } = require("../utils/sendMail");
 const { genDevSensorID } = require("../utils/genDevID");
-
 class UserService {
 
   async register(data) {
@@ -45,6 +49,15 @@ class UserService {
     return saved;
   }
 
+  async googleAuth(data) {
+    if(!data) throw new CustomError("Not Authorized", 403);
+      return data;
+  }
+
+  async  googleAuthFailed() {
+    return false;
+  }
+  
   async login(data) {
     const email = data.email;
     const user_data = await User.findOne({ email });

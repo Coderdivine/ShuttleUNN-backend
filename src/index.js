@@ -3,7 +3,28 @@ const app = require("express")();
 require("./middlewares/pre-route.middleware")(app);
 app.use(require("./routes"));
 require("./middlewares/error.middleware")(app);
-const PORT = process.env.PORT || 4109;
+const PORT = process.env.PORT || 5001;
+const passport = require("passport");
+const passportSetup = require("./Passport");
+const cookieSession = require("cookie-session");
+const rateLimit = require('express-rate-limit');
+
+const apiLimiter = rateLimit({
+  windowMs: 19 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+app.use(
+  cookieSession({
+    name: "session",
+    keys:["cyberwolve"],
+    maxAge: 24 * 60 * 60 * 100
+  })
+)
+app.use("/", apiLimiter);
+app.use(passport.initialize());
+app.use(passport.session()); 
 
 app.listen(PORT, async () => {
   require("./database/mongo");

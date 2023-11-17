@@ -21,6 +21,16 @@ class UserContoller {
         res.status(201).send(response("Login completed",result));
     }
 
+    async googleAuthFailed(req, res){
+        const result = await UserService.googleAuthFailed();
+        res.status(401).send(response("Login failed", result));
+    }
+
+    async googleAuth(req, res) {
+        const result = await UserService.googleAuthFailed(req?.user);
+        res.status(201).send(response("Login completed using google.", result));
+    }
+
     async dlt(req, res){
             if(!req.body) throw new CustomError("No request body",404);
             const result = await UserService.dlt(req.body.email);
