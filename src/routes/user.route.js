@@ -12,6 +12,7 @@ router.get("/user-data/:user_id", UserCtrl.user_data);
 router.post("/reset-password", UserCtrl.resetPassword);
 router.post("/verify-reset-password", UserCtrl.verifyResetToken);
 router.post("/update-info", UserCtrl.updateInfo);
+router.post("/register-device", UserCtrl.registerNotifcationDevice);
 router.post("/suspend-account", UserCtrl.suspendAccount);
 router.post("/release-account", UserCtrl.realeaseAccount);
 router.get("/user-billing/:user_id", UserCtrl.userBilling);

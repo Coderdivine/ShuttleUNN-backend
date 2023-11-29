@@ -112,6 +112,18 @@ const UserSchema = new Schema(
     lastLogin:{
       type:Date,
       default:Date.now()
+    },
+    fcm_token: {
+      type:[{
+        device:String,
+        token:String
+      }],
+      default:[
+        {
+          device:"NO_DEVICE",
+          token:""
+        }
+      ]
     }
   },
   {

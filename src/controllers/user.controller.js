@@ -21,6 +21,15 @@ class UserContoller {
         res.status(201).send(response("Login completed",result));
     }
 
+    async registerNotifcationDevice(req, res) {
+        const user_id = req.user_id || req.body.user_id || req.params.user_id;
+        const { deviceName } = req.useragent;
+        if(!deviceName) throw new CustomError("Can't register device", 400);
+        const device_name = deviceName;
+        const result = await UserService.registerNotifcationDevice(user_id,{...req.body, device_name});
+        res.status(401).send(response("Device registered. Start recieving notifcation from DevSensor", result));
+    }
+
     async googleAuthFailed(req, res){
         const result = await UserService.googleAuthFailed();
         res.status(401).send(response("Login failed", result));

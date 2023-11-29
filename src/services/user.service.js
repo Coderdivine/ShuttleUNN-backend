@@ -7,14 +7,14 @@ const VToken = require("./../models/vtoken.model");
 const CustomError = require("./../utils/custom-error");
 const bcrypt = require("bcrypt");
 const uuid = require("uuid");
-
 const passport = require("passport");
 const cookieSession = require("cookie-session");
-
 const randonNum = require("../utils/randonNum");
 const { sendMail, resetPassword } = require("../utils/sendMail");
 const { genDevSensorID } = require("../utils/genDevID");
+const OneSignal = require("../utils/OneSignal");
 class UserService {
+
 
   async register(data) {
     if (!data.email) throw new CustomError("Please provide email address");
@@ -136,7 +136,6 @@ class UserService {
     if (data.password) {
       const hash = await bcrypt.hash(data.password, 10);
       data.password = hash;
-      console.log({ ["ripping_hash"]: data.password });
       const user = await User.updateOne({ user_id }, { $set: data });
       console.log({ user });
 

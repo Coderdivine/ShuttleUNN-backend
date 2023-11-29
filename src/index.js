@@ -8,9 +8,11 @@ const passport = require("passport");
 const passportSetup = require("./Passport");
 const cookieSession = require("cookie-session");
 const rateLimit = require('express-rate-limit');
+const useragent = require('express-useragent');
+app.use(useragent.express());
 
 const apiLimiter = rateLimit({
-  windowMs: 19 * 60 * 1000,
+  windowMs: 199 * 60 * 1000,
   max: 100,
   message: 'Too many requests from this IP, please try again later.',
 });
