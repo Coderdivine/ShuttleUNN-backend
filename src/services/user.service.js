@@ -12,7 +12,7 @@ const cookieSession = require("cookie-session");
 const randonNum = require("../utils/randonNum");
 const { sendMail, resetPassword } = require("../utils/sendMail");
 const { genDevSensorID } = require("../utils/genDevID");
-const OneSignal = require("../utils/OneSignal");
+require("../utils/firebase");
 class UserService {
 
 
