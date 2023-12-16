@@ -83,8 +83,15 @@ class UserContoller {
        
     }
 
+    async registerDeviceForNotification(req, res) {
+            if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
+            const result = await UserService.registerDeviceForNotification(req.body.user_id, req.body);
+            if(!result) throw new CustomError("Something went wrong. please try again later",400);
+            res.status(201).send(response("Device registered for notifications.",result));
+    }
+
     async realeaseAccount(req, res){
-            if(!req.body) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
+            if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
             const result = await UserService.realeaseAccount(req.body.user_id);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("Account suspension lifted.",result));
@@ -92,7 +99,7 @@ class UserContoller {
     }
 
     async userBilling(req, res){
-            if(!req.params) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
+            if(!req.params) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
             const result = await UserService.userBilling(req.params.user_id);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("User billing listings.",result));
@@ -100,7 +107,7 @@ class UserContoller {
     }
 
     async addToUserbilling(req, res){
-            if(!req.body) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
+            if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
             const result = await UserService.addToUserbilling(req.body.user_id, req.body);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("User billing added.",result));
@@ -108,14 +115,14 @@ class UserContoller {
     }
 
     async getUserRoutine(req, res){
-            if(!req.params) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
+            if(!req.params) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
             const result = await UserService.getUserRoutine(req.params.user_id);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("User routine.",result));
     }
 
     async addToUserRoutine(req, res){
-            if(!req.body) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
+            if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
             const result = await UserService.addToUserRoutine(req.body.user_id, req.body.routine_name, req.body.time);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("Routine successfully added.",result));
@@ -123,14 +130,14 @@ class UserContoller {
     }
 
     async editUserRoutine(req, res){
-            if(!req.body) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
+            if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
             const result = await UserService.editUserRoutine(req.body.user_id, req.body.routine_id, req.body.updatedValue, req.body.updatedField);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("Routine updated successfully.",result));
     }
 
     async deleteFromUserRoutine(req, res){
-            if(!req.body) throw new CustomError("The application is experiencing problems with sending your request. Please attempt again later or log in.",400);
+            if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
             const result = await UserService.deleteFromUserRoutine(req.body.user_id, req.body.routine_id);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("Routine deleted successfully.",result));

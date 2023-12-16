@@ -24,21 +24,32 @@ class UserService {
     const finEmail = await User.findOne({ email: data.email });
     if (finEmail)
       throw new CustomError(
-        "Oops! Email already registered. Please choose another one."
+        "Email already registered. Please choose another one."
       );
+
+    if(!data.email.includes("@")) throw new CustomError("Please provide a valid email address", 400);
+    if(!data.firstName) throw new CustomError("Please provide your first name", 400);
+    if(!data.lastName) throw new CustomError("Please provide your last name", 400);
+    if(!data.password) throw new CustomError("Please provide a password", 400);
+
     const devsensor_id = genDevSensorID(data.email);
-    console.log({ devsensor_id });
+    console.log({ devsensor_id })
+
     const newUser = new User({
       email: data.email,
       user_id,
       devsensor_id,
       username: `${data.email.split("@")[0]}` || "",
       password: hash,
+      firstName: data.firstName,
+      lastName: data.lastName
     });
+
     const newDevice = new Device({
         user_id,
         devsensor_id
     });
+
     const saved = await newUser.save();
     const new_d_saved = await newDevice.save();
     if (!saved || !new_d_saved)
@@ -52,6 +63,7 @@ class UserService {
   async googleAuth(data) {
     if(!data) throw new CustomError("Not Authorized", 403);
       return data;
+    
   }
 
   async  googleAuthFailed() {
@@ -75,7 +87,15 @@ class UserService {
 
   async dlt(email) {
     const dlt = await User.deleteMany({ email: email });
-    return dlt;
+    if(dlt.deletedCount >= 1){
+      return {
+        message: "Account deleted successfully",
+      }
+    } else {
+      return {
+        message: "Account not found. Please try again",
+      }
+    }
   }
 
   async sendEmail({ email }) {
@@ -135,7 +155,7 @@ class UserService {
   async update(user_id, data) {
     if (data.password) {
       const hash = await bcrypt.hash(data.password, 10);
-      data.password = hash;
+      data.password = hash
       const user = await User.updateOne({ user_id }, { $set: data });
       console.log({ user });
 
@@ -174,6 +194,18 @@ class UserService {
    
   }
 
+  async registerDeviceForNotification(user_id, data) {
+    if(!user_id) throw new CustomError("User not found", 404);
+    const user = await User.findOne({ user_id });
+    if(!user) throw new CustomError("User not found", 404);
+    if(!data.fcm_token) throw new CustomError("Unable to regster device", 400);
+    const fcm_token = { device: "No_name", token: data.fcm_token };
+    const ifToken = (user.fcm_token).some(token => token.token === data.fcm_token);
+    if(ifToken) throw new CustomError("Device already registered", 400);
+    user.fcm_token = [...user.fcm_token, fcm_token ];
+    const saved = await user.save();
+    return saved;
+  }
 
   async userBilling(user_id) {
       if (!user_id)

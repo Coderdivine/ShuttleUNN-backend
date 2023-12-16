@@ -4,11 +4,20 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const uuid = require("uuid");
 
+
 const UserSchema = new Schema(
   {
     user_id:{
         type:String,
         required:true,
+    },
+    firstName:{
+      type:String,
+      default:"No first name"
+    },
+    lastName:{
+      type:String,
+      default:"No last name"
     },
     devsensor_id:{
       type:String,

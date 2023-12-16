@@ -5,10 +5,10 @@ const CustomError = require("../utils/custom-error");
 class DeviceController {
 
     async getDeviceDetails(req, res) {
-              if (!req.params) throw new CustomError("No parameter passed.", 400);
+            if (!req.params) throw new CustomError("No parameter passed.", 400);
             const result = await DeviceService.getDeviceDetails({ devsensor_id: req.params.devsensor_id });
             if(!result) throw new CustomError("No result returned. Please make sure your device is activated.", 400);
-            res.status(200).send(response("Wifi strength detected", result));
+            res.status(200).send(response("Device information", result));
 
     }
 
