@@ -14,8 +14,6 @@ const { sendMail, resetPassword } = require("../utils/sendMail");
 const { genDevSensorID } = require("../utils/genDevID");
 require("../utils/firebase");
 class UserService {
-
-
   async register(data) {
     if (!data.email) throw new CustomError("Please provide email address");
     const user_id = uuid.v4().toString();
@@ -27,13 +25,16 @@ class UserService {
         "Email already registered. Please choose another one."
       );
 
-    if(!data.email.includes("@")) throw new CustomError("Please provide a valid email address", 400);
-    if(!data.firstName) throw new CustomError("Please provide your first name", 400);
-    if(!data.lastName) throw new CustomError("Please provide your last name", 400);
-    if(!data.password) throw new CustomError("Please provide a password", 400);
+    if (!data.email.includes("@"))
+      throw new CustomError("Please provide a valid email address", 400);
+    if (!data.firstName)
+      throw new CustomError("Please provide your first name", 400);
+    if (!data.lastName)
+      throw new CustomError("Please provide your last name", 400);
+    if (!data.password) throw new CustomError("Please provide a password", 400);
 
     const devsensor_id = genDevSensorID(data.email);
-    console.log({ devsensor_id })
+    console.log({ devsensor_id });
 
     const newUser = new User({
       email: data.email,
@@ -42,12 +43,12 @@ class UserService {
       username: `${data.email.split("@")[0]}` || "",
       password: hash,
       firstName: data.firstName,
-      lastName: data.lastName
+      lastName: data.lastName,
     });
 
     const newDevice = new Device({
-        user_id,
-        devsensor_id
+      user_id,
+      devsensor_id,
     });
 
     const saved = await newUser.save();
@@ -61,15 +62,14 @@ class UserService {
   }
 
   async googleAuth(data) {
-    if(!data) throw new CustomError("Not Authorized", 403);
-      return data;
-    
+    if (!data) throw new CustomError("Not Authorized", 403);
+    return data;
   }
 
-  async  googleAuthFailed() {
+  async googleAuthFailed() {
     return false;
   }
-  
+
   async login(data) {
     const email = data.email;
     const user_data = await User.findOne({ email });
@@ -87,14 +87,14 @@ class UserService {
 
   async dlt(email) {
     const dlt = await User.deleteMany({ email: email });
-    if(dlt.deletedCount >= 1){
+    if (dlt.deletedCount >= 1) {
       return {
         message: "Account deleted successfully",
-      }
+      };
     } else {
       return {
         message: "Account not found. Please try again",
-      }
+      };
     }
   }
 
@@ -155,7 +155,7 @@ class UserService {
   async update(user_id, data) {
     if (data.password) {
       const hash = await bcrypt.hash(data.password, 10);
-      data.password = hash
+      data.password = hash;
       const user = await User.updateOne({ user_id }, { $set: data });
       console.log({ user });
 
@@ -171,144 +171,158 @@ class UserService {
   }
 
   async suspendAccount(user_id) {
-      if (!user_id)
-        throw new CustomError(
-          "Kindly log in once more to finalize this attempt.",
-          400
-        );
-      const user_account = await User.findOne({ user_id });
-      user_account.isSuspended = true;
-      const saved = await user_account.save();
-      return saved;
+    if (!user_id)
+      throw new CustomError(
+        "Kindly log in once more to finalize this attempt.",
+        400
+      );
+    const user_account = await User.findOne({ user_id });
+    user_account.isSuspended = true;
+    const saved = await user_account.save();
+    return saved;
   }
 
   async realeaseAccount(user_id) {
-      if (!user_id)
-        throw new CustomError(
-          "Kindly log in once more to finalize this attempt.",
-          400
-        );
-      const user_account = await User.findOne({ user_id });
-      user_account.isSuspended = false;
-      const saved = await user_account.save();
-   
+    if (!user_id)
+      throw new CustomError(
+        "Kindly log in once more to finalize this attempt.",
+        400
+      );
+    const user_account = await User.findOne({ user_id });
+    user_account.isSuspended = false;
+    const saved = await user_account.save();
   }
 
   async registerDeviceForNotification(user_id, data) {
-    if(!user_id) throw new CustomError("User not found", 404);
+    if (!user_id) throw new CustomError("User not found", 404);
     const user = await User.findOne({ user_id });
-    if(!user) throw new CustomError("User not found", 404);
-    if(!data.fcm_token) throw new CustomError("Unable to regster device", 400);
+    if (!user) throw new CustomError("User not found", 404);
+    if (!data.fcm_token) throw new CustomError("Unable to regster device", 400);
     const fcm_token = { device: "No_name", token: data.fcm_token };
-    const ifToken = (user.fcm_token).some(token => token.token === data.fcm_token);
-    if(ifToken) throw new CustomError("Device already registered", 400);
-    user.fcm_token = [...user.fcm_token, fcm_token ];
+    console.log({ fcm_token: data.fcm_token })
+    const ifToken = user.fcm_token.some(
+      (token) => token.token === data.fcm_token
+    );
+    if (ifToken) throw new CustomError("Device already registered", 400);
+    user.fcm_token = [...user.fcm_token, fcm_token];
     const saved = await user.save();
     return saved;
   }
 
+  async deleteRegisteredDevice(user_id, data) {
+    const user = await User.findOne({ user_id });
+    if (!user) throw new CustomError("User not found", 404);
+    if (!data?.fcm_token)
+      throw new CustomError("Unable to unregister device", 400);
+    const fcm_token = data.fcm_token;
+    const index = (user?.fcm_token).findIndex((t) => t.token === fcm_token);
+    console.log({ index });
+    if (index === -1) {
+      console.log("FCM token not found");
+      throw new CustomError("FCM token not found", 404);
+    }
+    user.fcm_token.splice(index, 1);
+    const user_saved = await user.save();
+    console.log('Device token deleted successfully');
+    return user_saved;
+  }
+
   async userBilling(user_id) {
-      if (!user_id)
-        throw new CustomError(
-          "Kindly log in once more to finalize this attempt.",
-          400
-        );
-      const user_bills = await Billing.find({ user_id });
-      return user_bills;
-    
+    if (!user_id)
+      throw new CustomError(
+        "Kindly log in once more to finalize this attempt.",
+        400
+      );
+    const user_bills = await Billing.find({ user_id });
+    return user_bills;
   }
 
   async addToUserbilling(user_id, data) {
-      if (!user_id)
-        throw new CustomError(
-          "Kindly log in once more to finalize this attempt.",
-          400
-        );
-      const nextExpires = 100000000;
-      const newBilling = new Billing({
-        user_id,
-        period: data.period,
-        billing_id: uuid.v4().toString(),
-        plan_name: data.plan_name,
-        plan_price: data.plan_price,
-        time: Date.now(),
-        expires: Date.now() + nextExpires,
-        nextBilling: Date.now() + nextExpires + 360000,
-      });
-      const saved = await newBilling.save();
-      console.log({ saved });
-      return saved;
+    if (!user_id)
+      throw new CustomError(
+        "Kindly log in once more to finalize this attempt.",
+        400
+      );
+    const nextExpires = 100000000;
+    const newBilling = new Billing({
+      user_id,
+      period: data.period,
+      billing_id: uuid.v4().toString(),
+      plan_name: data.plan_name,
+      plan_price: data.plan_price,
+      time: Date.now(),
+      expires: Date.now() + nextExpires,
+      nextBilling: Date.now() + nextExpires + 360000,
+    });
+    const saved = await newBilling.save();
+    console.log({ saved });
+    return saved;
   }
 
-
   async getUserRoutine(user_id) {
-      if (!user_id)
-        throw new CustomError(
-          "Kindly log in once more to finalize this attempt.",
-          400
-        );
-      const user_routine = await User.findOne({ user_id });
-      const routine = user_routine.dailyRoutine;
-      return routine;
+    if (!user_id)
+      throw new CustomError(
+        "Kindly log in once more to finalize this attempt.",
+        400
+      );
+    const user_routine = await User.findOne({ user_id });
+    const routine = user_routine.dailyRoutine;
+    return routine;
   }
 
   async addToUserRoutine(user_id, routine_name, time) {
-
-      if (!user_id)
-        throw new CustomError(
-          "Kindly log in once more to finalize this attempt.",
-          400
-        );
-
-      const newRoutine = {
-        routine_id:uuid.v4().toString(),
-        routine: routine_name,
-        time,
-        date: Date.now(),
-      };
-
-      const saved = await User.updateOne(
-        { user_id: user_id },
-        { $push: { dailyRoutine: newRoutine } }
+    if (!user_id)
+      throw new CustomError(
+        "Kindly log in once more to finalize this attempt.",
+        400
       );
 
-      return saved;
-   
+    const newRoutine = {
+      routine_id: uuid.v4().toString(),
+      routine: routine_name,
+      time,
+      date: Date.now(),
+    };
+
+    const saved = await User.updateOne(
+      { user_id: user_id },
+      { $push: { dailyRoutine: newRoutine } }
+    );
+
+    return saved;
   }
 
   async editUserRoutine(user_id, routine_id, updatedValue, updatedField) {
-      if (!user_id)
-        throw new CustomError(
-          "Kindly log in once more to finalize this attempt.",
-          400
-        );
-        
-        const updateQuery = {};
-        updateQuery[`dailyRoutine.$.${updatedField}`] = updatedValue;
+    if (!user_id)
+      throw new CustomError(
+        "Kindly log in once more to finalize this attempt.",
+        400
+      );
 
-        const edited = await User.updateOne(
-        { user_id: user_id, 'dailyRoutine.routine_id': routine_id },
-        { $set: updateQuery }
-        )
-        return edited
+    const updateQuery = {};
+    updateQuery[`dailyRoutine.$.${updatedField}`] = updatedValue;
+
+    const edited = await User.updateOne(
+      { user_id: user_id, "dailyRoutine.routine_id": routine_id },
+      { $set: updateQuery }
+    );
+    return edited;
   }
 
   async deleteFromUserRoutine(user_id, routine_id) {
-      if (!user_id)
-        throw new CustomError(
-          "Kindly log in once more to finalize this attempt.",
-          400
-        );
-        
-        const deleted = await User.updateOne(
-        { user_id: user_id },
-        { $pull: { dailyRoutine: { routine_id: routine_id } } }
-        )
+    if (!user_id)
+      throw new CustomError(
+        "Kindly log in once more to finalize this attempt.",
+        400
+      );
 
-        return deleted;
+    const deleted = await User.updateOne(
+      { user_id: user_id },
+      { $pull: { dailyRoutine: { routine_id: routine_id } } }
+    );
+
+    return deleted;
   }
-
-
 }
 
 module.exports = new UserService();

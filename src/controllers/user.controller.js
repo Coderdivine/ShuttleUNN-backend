@@ -85,9 +85,17 @@ class UserContoller {
 
     async registerDeviceForNotification(req, res) {
             if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
+            req.body.fcm_token = req.params.fcm_token;
             const result = await UserService.registerDeviceForNotification(req.body.user_id, req.body);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("Device registered for notifications.",result));
+    }
+
+    async deleteRegisteredDevice(req, res) {
+        if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
+        const result = await UserService.deleteRegisteredDevice(req.body.user_id, req.body);
+        if(!result) throw new CustomError("Something went wrong. please try again later",400);
+        res.status(201).send(response("Device token deleted successfully",result));
     }
 
     async realeaseAccount(req, res){

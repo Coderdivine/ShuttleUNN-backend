@@ -122,6 +122,14 @@ const UserSchema = new Schema(
       type:Date,
       default:Date.now()
     },
+    alertInterval:{
+      type:Number,
+      default:20
+    },
+    workoutAlert:{
+      type:Number,
+      default:20
+    },
     fcm_token: {
       type:[{
         device:String,

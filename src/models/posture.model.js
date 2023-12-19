@@ -1,6 +1,5 @@
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
-// const { BCRYPT_SALT } = require("../config");
 const Schema = mongoose.Schema;
 const uuid = require("uuid");
 
@@ -38,6 +37,42 @@ const Posture = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "devsensor-user-posture-schema",
     },
+    camera_resolution:{
+      type:String,
+      required: true
+    },
+    deviceX:{
+      type:String,
+      required: true 
+    },
+    deviceY:{
+      type:String,
+      required: true
+    },
+    normalizedX:{
+      type:Number,
+      required: true
+    },
+    normalizedY:{
+      type:String,
+      required: true
+    },
+    height:{
+      type:String,
+      required: true 
+    },
+    width:{
+      type:String,
+      required: true
+    },
+    trackInterval:{
+      type:Number,
+      required: true
+    },
+    deviceType:{
+      type:String,
+      required: true
+    }
   },
   {
     timestamps: true,
@@ -63,6 +98,7 @@ Posture.pre("save", async function (next) {
     console.log({ "PreSave Error":error })
     return next(error);
   }
-});
+})
+
 
 module.exports = mongoose.model("devsensor-user-posture-schema", Posture);

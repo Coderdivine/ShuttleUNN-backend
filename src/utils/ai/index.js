@@ -97,6 +97,7 @@ async function useAiImage(prompt){
       }
 }
 
+
 // useAiImage(2).then((res) =>{
 //     console.log(res)
 // });

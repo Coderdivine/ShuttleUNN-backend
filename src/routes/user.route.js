@@ -16,6 +16,7 @@ router.post("/register-device", UserCtrl.registerNotifcationDevice);
 router.post("/suspend-account", UserCtrl.suspendAccount);
 router.post("/release-account", UserCtrl.realeaseAccount);
 router.post("/register-device-for-notification", UserCtrl.registerDeviceForNotification);
+router.post("/dlt-device-for-notification", UserCtrl.deleteRegisteredDevice);
 router.get("/user-billing/:user_id", UserCtrl.userBilling);
 router.post("/add-to-billing", UserCtrl.addToUserbilling);
 router.get("/get-routine/:user_id", UserCtrl.getUserRoutine);

@@ -1,8 +1,6 @@
-const { BCRYPT_SALT } = require("../config");
 const User = require("../models/user.model");
 const Workout = require("../models/workout.model");
 const CustomError = require("../utils/custom-error");
-const bcrypt = require("bcrypt");
 const uuid = require("uuid");
 const randonNum = require("../utils/randonNum");
 
