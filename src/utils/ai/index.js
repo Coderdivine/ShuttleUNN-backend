@@ -1,9 +1,13 @@
 require("dotenv").config();
-const { Configuration, OpenAIApi } = require("openai");
-const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
+const CombineAI = require("./combine.ai");
+const WorkoutAI = require("./workout.ai");
+const PostureAI = require("./posture.ai");
+const open_ai = require("openai");
+const apiKey = process.env.OPENAI_API_KEY;
+const openai = new open_ai({
+  apiKey,
 });
-const openai = new OpenAIApi(configuration);
+
 
 
 async function useAi(prompt){
@@ -103,5 +107,8 @@ async function useAiImage(prompt){
 // });
 
 module.exports = { 
-    useAi
+    useAi,
+    CombineAI,
+    WorkoutAI,
+    PostureAI
  };

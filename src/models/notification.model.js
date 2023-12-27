@@ -1,10 +1,15 @@
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
+const { URL } = require("../config");
 const Schema = mongoose.Schema;
 const uuid = require("uuid");
 
 const Notification = new Schema({
   notification_id: {
+    type: String,
+    required: true,
+  },
+  user_id: {
     type: String,
     required: true,
   },
@@ -24,6 +29,10 @@ const Notification = new Schema({
     type:String,
     requied: false
   },
+  link:{
+    type:String,
+    default:URL.DASHBOARD_URL
+  },
   image: {
     type: String,
     default: "",
@@ -36,6 +45,10 @@ const Notification = new Schema({
   nextNotification:{
     type:Date,
     required: true
+  },
+  sent:{
+    type:Boolean,
+    default: false
   },
   isRead:{
     type:Boolean,

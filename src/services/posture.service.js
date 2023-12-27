@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const uuid = require("uuid");
 const randonNum = require("../utils/randonNum");
 const { useAi } = require("../utils/ai");
+const Notification = require("../models/notification.model");
 
 class PostureService {
 
@@ -51,6 +52,10 @@ class PostureService {
  
   }
 
+  async postureSummary(user_id) {
+    const message = await Notification.findOne({ user_id }).sort({ date: -1 });
+    return message;
+  }
 
   async generatePrompt(postures) {
     const postureData = postures.map(
@@ -176,7 +181,7 @@ class PostureService {
     const postures = await Posture.find(
       {
         user_id: user_id,
-        date: { $gte: startOfDay, $lt: endOfDay },
+        // date: { $gte: startOfDay, $lt: endOfDay },
       },
       {
         posture_name: 1,

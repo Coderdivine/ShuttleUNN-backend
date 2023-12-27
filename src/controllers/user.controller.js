@@ -1,6 +1,7 @@
 const response = require("../utils/response");
 const UserService = require("../services/user.service");
 const CustomError = require("../utils/custom-error");
+const Excerise = require("../services/excerise.service");
 
 class UserContoller {
 
@@ -85,7 +86,6 @@ class UserContoller {
 
     async registerDeviceForNotification(req, res) {
             if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
-            req.body.fcm_token = req.params.fcm_token;
             const result = await UserService.registerDeviceForNotification(req.body.user_id, req.body);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("Device registered for notifications.",result));
@@ -149,6 +149,13 @@ class UserContoller {
             const result = await UserService.deleteFromUserRoutine(req.body.user_id, req.body.routine_id);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("Routine deleted successfully.",result));
+    }
+
+    async getWorkoutByUser_id(req, res) {
+        if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
+            const result = await Excerise.getWorkoutByUser_id(req.body.user_id);
+            if(!result) throw new CustomError("Something went wrong. please try again later",400);
+            res.status(201).send(response("Workout requested.",result));
     }
 
     

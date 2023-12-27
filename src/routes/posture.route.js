@@ -14,6 +14,7 @@ router.post("/six-posture", PostureCtrl.lastSixPosturesImage);
 router.post("/common-posture", PostureCtrl.fiveCommonPostures);
 router.post("/posture-period", PostureCtrl.groupPosturesByPeriod);
 router.post("/predict-workout", PostureCtrl.predictWorkout);
+router.post("/last-summary", PostureCtrl.postureSummary);
 
 
 module.exports = router;

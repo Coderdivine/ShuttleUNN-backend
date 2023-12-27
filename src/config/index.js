@@ -9,7 +9,7 @@ const config = {
     },
     URL: {
         LANDING_URL: process.env.LANDING_URL || "http://localhost:3000",
-        DASHBOARD_URL: process.env.DASHBOARD_URL || "http://localhost:3001"
+        DASHBOARD_URL: process.env.DASHBOARD_URL || "http://localhost:3000/dashboard"
     },
     mailer: {
         HOST: process.env.MAILER_HOST || "smtp.gmail.com",
@@ -18,7 +18,8 @@ const config = {
         PORT: process.env.MAILER_PORT || 465,
         SECURE: process.env.MAILER_SECURE || true,
         DOMAIN: "https://mailing.axgura.com"
-    }
+    },
+    AffectedBodyParts:[]
 };
 
 module.exports = config;

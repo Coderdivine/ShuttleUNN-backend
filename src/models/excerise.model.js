@@ -36,6 +36,10 @@ const Excerise = new Schema({
     type: String,
     default: "",
   },
+  instruction: {
+    type:String,
+    required: true
+  },
   difficultyLevel:{
     type:String,
     enum:["easy","soft","hard"],

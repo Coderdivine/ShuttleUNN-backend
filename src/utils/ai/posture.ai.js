@@ -1,19 +1,25 @@
 require("dotenv").config();
-const { Configuration, OpenAIApi } = require("openai");
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const open_ai = require("openai");
+const apiKey = process.env.OPENAI_API_KEY;
+const openai = new open_ai({
+  apiKey,
 });
-const openai = new OpenAIApi(configuration);
+const { AffectedBodyParts } = require("../../config");
+
+
 
 class PostureAI {
+
   async createWarning(data) {
     const { postures } = data;
     const current_date = Date.now();
-    const createMessage = `Please act a proffessional human body posture instructor and assistant.`;
+    const createMessage = `Be a proffessional human body posture instructor and assistant.
+    here's the user's recent posture:
+    ${postures}, current date: ${current_date}`;
     const messages = [{ role: "user", content: createMessage }];
     const functions = [
       {
-        name: "create_workout",
+        name: "create_warning",
         description: `Please act a proffessional human body posture instructor and assistant.`,
         parameters: {
           type: "object",
@@ -35,12 +41,18 @@ class PostureAI {
               enum: ["minor", "serious", "notimportant", "notserious", "important"],
               description: `choose a warning level damage`,
             },
+            areas: {
+              type:"string",
+              enum: AffectedBodyParts,
+              description: "Please choose the area of the body affected by the postures given"
+          }
           },
           required: [
             "warning",
             "warning_description",
             "warning_notification_text",
-            "damageLevel"
+            "damageLevel",
+            "areas"
           ],
         },
       },
@@ -58,16 +70,26 @@ class PostureAI {
 
     if (responseMessage.function_call) {
       const availableFunctions = {
-        get_reviews: this.createWarningObject,
+        create_warning: this.createWarningObject,
       };
       const functionName = responseMessage.function_call.name;
       const functionToCall = availableFunctions[functionName];
-      const functionArgs = JSON.parse(responseMessage.function_call.arguments);
+      const functionArgs = responseMessage.function_call.arguments;
+
+      let parsedArgs;
+        try {
+            parsedArgs = JSON.parse(functionArgs);
+        } catch (error) {
+            console.error('Error parsing JSON arguments:', error.message);
+            throw new CustomError("Unable to parse JSON arguments.", 400);
+        }
+        
       const functionResponse = functionToCall(
-        functionArgs.warning,
-        functionArgs.warning_description,
-        functionArgs.warning_notification_text,
-        functionArgs.damageLevel
+        parsedArgs.warning,
+        parsedArgs.warning_description,
+        parsedArgs.warning_notification_text,
+        parsedArgs.damageLevel,
+        parsedArgs.areas
       );
       
       messages.push(responseMessage);
@@ -77,7 +99,7 @@ class PostureAI {
         content: functionResponse,
       });
 
-      return functionArgs;
+      return parsedArgs;
     }
   }
 
@@ -85,26 +107,30 @@ class PostureAI {
     warning,
     warning_description,
     warning_notification_text,
-    damageLevel
+    damageLevel,
+    areas
   ) {
     const reviewInfo = {
         warning,
         warning_description,
         warning_notification_text,
-        damageLevel
+        damageLevel,
+        areas
     };
 
-    return JSON.stringify(reviewInfo);
+    return (reviewInfo);
   }
 
   async createAlert(data) {
     const { postures } = data;
     const current_date = Date.now();
-    const createMessage = `Please act a proffessional human body posture instructor and assistant.`;
+    const createMessage = `Be a proffessional human body posture instructor and assistant. send user posture alert based on his/her recent posture:
+    ${postures}, current date -> ${current_date}
+    `;
     const messages = [{ role: "user", content: createMessage }];
     const functions = [
       {
-        name: "create_workout",
+        name: "create_alert",
         description: `Please act a proffessional human body posture instructor and assistant.`,
         parameters: {
           type: "object",
@@ -126,12 +152,18 @@ class PostureAI {
               enum: ["minor", "serious", "notimportant", "notserious", "important"],
               description: `choose a alert level`,
             },
+            areas: {
+              type:"string",
+              enum: AffectedBodyParts,
+              description: "Please choose the area of the body affected by the postures given"
+          }
           },
           required: [
             "alert",
             "alert_description",
             "alert_notification_text",
-            "damageLevel"
+            "damageLevel",
+            "areas"
           ],
         },
       },
@@ -149,16 +181,26 @@ class PostureAI {
 
     if (responseMessage.function_call) {
       const availableFunctions = {
-        get_reviews: this.createAlertObject,
+        create_alert: this.createAlertObject,
       };
       const functionName = responseMessage.function_call.name;
       const functionToCall = availableFunctions[functionName];
-      const functionArgs = JSON.parse(responseMessage.function_call.arguments);
+      const functionArgs = responseMessage.function_call.arguments;
+
+      let parsedArgs;
+      try {
+          parsedArgs = JSON.parse(functionArgs);
+      } catch (error) {
+          console.error('Error parsing JSON arguments:', error.message);
+          throw new CustomError("Unable to parse JSON arguments.", 400);
+      }
+
       const functionResponse = functionToCall(
-        functionArgs.alert,
-        functionArgs.alert_description,
-        functionArgs.alert_notification_text,
-        functionArgs.damageLevel
+        parsedArgs.alert,
+        parsedArgs.alert_description,
+        parsedArgs.alert_notification_text,
+        parsedArgs.damageLevel,
+        parsedArgs.areas
       );
       
       messages.push(responseMessage);
@@ -168,7 +210,7 @@ class PostureAI {
         content: functionResponse,
       });
 
-      return functionArgs;
+      return parsedArgs;
     }
   }
 
@@ -176,16 +218,18 @@ class PostureAI {
     alert,
     alert_description,
     alert_notification_text,
-    damageLevel
+    damageLevel,
+    areas
   ) {
     const reviewInfo = {
         alert,
         alert_description,
         alert_notification_text,
-        damageLevel
+        damageLevel,
+        areas
     };
 
-    return JSON.stringify(reviewInfo);
+    return reviewInfo;
   }
 }
 

@@ -1,10 +1,12 @@
 require("dotenv").config();
-const { Configuration, OpenAIApi } = require("openai");
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const open_ai = require("openai");
+const apiKey = process.env.OPENAI_API_KEY;
+const openai = new open_ai({
+  apiKey,
 });
+const { AffectedBodyParts } = require("../../config");
 
-const openai = new OpenAIApi(configuration);
+
 
 class WorkoutAI {
   async generateWorkout(data) {
@@ -13,7 +15,7 @@ class WorkoutAI {
     const current_date = Date.now();
     const createMessage = `Please act a proffessional workout instructor and assistance.
         Please create a workout based on this user's recent postures:
-        ${postures}. we thes following workouts: ${lastWorkoutSent} on ${lastWorkoutDate} and its ${current_date}.
+        ${postures}. we these following workouts: ${lastWorkoutSent} on ${lastWorkoutDate} and its ${current_date}.
         make sure you return something different but related to the user's postures.    
         `;
     const messages = [{ role: "user", content: createMessage }];
@@ -21,7 +23,7 @@ class WorkoutAI {
       {
         name: "create_workout",
         description: `Please create a workout based on this user's recent postures:
-              ${postures}. we thes following workouts: ${lastWorkoutSent} on ${lastWorkoutDate} and its ${current_date}.
+              ${postures}. we these following workouts: ${lastWorkoutSent} on ${lastWorkoutDate} and its ${current_date}.
               make sure you return something different but related to the user's postures.
               `,
         parameters: {
@@ -52,6 +54,11 @@ class WorkoutAI {
               enum: ["veryeasy", "easy", "normal", "hard", "veryhard"],
               description: `choose diffculty level`,
             },
+            areas: {
+              type:"string",
+              enum:AffectedBodyParts,
+              description: "Please choose the area of the body affected by the postures given"
+          }
           },
           required: [
             "workout_name",
@@ -60,6 +67,7 @@ class WorkoutAI {
             "instruction",
             "difficultyLevel",
             "duration",
+            "areas"
           ],
         },
       },
@@ -83,12 +91,13 @@ class WorkoutAI {
       const functionToCall = availableFunctions[functionName];
       const functionArgs = JSON.parse(responseMessage.function_call.arguments);
       const functionResponse = functionToCall(
-        functionArgs.workout_name,
-        functionArgs.workout_description,
-        functionArgs.duration,
-        functionArgs.workout_notification_text,
-        functionArgs.instruction,
-        functionArgs.difficultyLevel
+        parsedArgs.workout_name,
+        parsedArgs.workout_description,
+        parsedArgs.duration,
+        parsedArgs.workout_notification_text,
+        parsedArgs.instruction,
+        parsedArgs.difficultyLevel,
+        parsedArgs.areas
       );
       messages.push(responseMessage);
       messages.push({
@@ -107,7 +116,8 @@ class WorkoutAI {
     duration,
     workout_notification_text,
     instruction,
-    difficultyLevel
+    difficultyLevel,
+    areas
   ) {
     const reviewInfo = {
         workout_name,
@@ -115,7 +125,8 @@ class WorkoutAI {
         duration,
         workout_notification_text,
         instruction,
-        difficultyLevel
+        difficultyLevel,
+        areas
     };
 
     return JSON.stringify(reviewInfo);

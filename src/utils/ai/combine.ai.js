@@ -1,110 +1,128 @@
 require("dotenv").config();
-const { Configuration, OpenAIApi } = require("openai");
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const open_ai = require("openai");
+const { AffectedBodyParts } = require("../../config");
+const apiKey = process.env.OPENAI_API_KEY;
+const openai = new open_ai({
+  apiKey,
 });
-const openai = new OpenAIApi(configuration);
 
-class PostureAI {
+
+class CombineAI {
   
   async combineAlert(data) {
-    const { postures, alert, warning, workouts } = data;
+    const { postures } = data;
     const current_date = Date.now();
-    const createMessage = `Combine these notifications together into a summary:
-    ${alert}
-    ${workouts}
-    ${warning}.
+    const createMessage = `
+    Be a posture instructor. based on user posture, create a summary warning user about thier recent posture and also recommend a suitable workout based on that posture.
+    here's the user's recent posture:
+    ${postures}, current date: ${current_date}
     `;
     const messages = [{ role: "user", content: createMessage }];
     const functions = [
-      {
-        name: "create_workout",
-        description: `Combine these notifications together into a summary:
-        ${alert}
-        ${workouts}
-        ${warning}.
+        {
+            name: "create_workout",
+            description: `Be a posture instructor. based on user posture, create a summary warning user about thier recent posture and also recommend a suitable workout based on that posture.
+        here's the user's recent posture.
         `,
-        parameters: {
-          type: "object",
-          properties: {
-            summary: {
-              type: "string",
-              description: `Create a notification summary. make sure it doesn't excceds 60 words`,
+            parameters: {
+                type: "object",
+                properties: {
+                    summary: {
+                        type: "string",
+                        description: `Create a notification summary. make sure it doesn't exceed 60 words`,
+                    },
+                    notification_notification_text: {
+                        type: "string",
+                        description: `Create the notification summary title. make sure the sentence doesn't exceed 50 words.`,
+                    },
+                    notification_description: {
+                        type: "string",
+                        description: `Create notification summary description. give some exercise to do and make it detailed if possible`,
+                    },
+                    importance: {
+                        type: "string",
+                        enum: ["minor", "serious", "notimportant", "notserious", "important"],
+                        description: `choose important level`,
+                    },
+                    areas: {
+                        type:"string",
+                        enum: AffectedBodyParts,
+                        description: "Please choose the area of the body affected by the postures given"
+                    }
+                },
+                required: [
+                    "summary",
+                    "notification_description",
+                    "notification_notification_text",
+                    "importance",
+                    "areas"
+                ],
             },
-            notification_description: {
-              type: "string",
-              description: `Create notification summary description.`,
-            },
-            notification_notification_text: {
-              type: "string",
-              description: `Create the notification summary title. make sure it doesn't excceds 45 words`,
-            },
-            importance: {
-              type: "string",
-              enum: ["minor", "serious", "notimportant", "notserious", "important"],
-              description: `choose important level`,
-            },
-          },
-          required: [
-            "warning",
-            "notification_description",
-            "notification_notification_text",
-            "importance"
-          ],
         },
-      },
     ];
 
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: messages,
-      functions: functions,
-      function_call: "auto",
+        model: "gpt-3.5-turbo",
+        messages: messages,
+        functions: functions,
+        function_call: "auto",
     });
 
     const responseMessage = response.choices[0].message;
-    console.log({ responseMessage });
-
     if (responseMessage.function_call) {
-      const availableFunctions = {
-        get_reviews: this.createWarningObject,
-      };
-      const functionName = responseMessage.function_call.name;
-      const functionToCall = availableFunctions[functionName];
-      const functionArgs = JSON.parse(responseMessage.function_call.arguments);
-      const functionResponse = functionToCall(
-        functionArgs.warning,
-        functionArgs.notification_description,
-        functionArgs.notification_notification_text,
-        functionArgs.importance
-      );
-      
-      messages.push(responseMessage);
-      messages.push({
-        role: "function",
-        name: functionName,
-        content: functionResponse,
-      });
+        const availableFunctions = {
+            create_workout: this.createWarningObject,
+        };
+        const functionName = responseMessage.function_call.name;
+        const functionToCall = availableFunctions[functionName];
+        const functionArgs = responseMessage.function_call.arguments;
 
-      return functionArgs;
+        
+        let parsedArgs;
+        try {
+            parsedArgs = JSON.parse(functionArgs);
+        } catch (error) {
+            console.error('Error parsing JSON arguments:', error.message);
+            throw new CustomError("Unable to parse JSON arguments.", 400);
+        }
+
+        const functionResponse = functionToCall(
+            parsedArgs.summary,
+            parsedArgs.notification_description,
+            parsedArgs.notification_notification_text,
+            parsedArgs.importance,
+            parsedArgs.areas
+        );
+
+        messages.push(functionResponse);
+        messages.push({
+            role: "function",
+            name: functionName,
+            content: functionResponse,
+        });
+
+        return parsedArgs;
     }
-  }
-
-  createWarningObject(
-    warning,
-    notification_description,
-    notification_notification_text,
-    importance
-  ) {
-    const reviewInfo = {
-        warning,
-        notification_description,
-        notification_notification_text,
-        importance
-    };
-
-    return JSON.stringify(reviewInfo);
-  }
 }
 
-module.exports = new PostureAI();
+createWarningObject(
+    summary,
+    notification_description,
+    notification_notification_text,
+    importance,
+    areas
+) {
+    const reviewInfo = {
+        summary,
+        notification_description,
+        notification_notification_text,
+        importance,
+        areas
+    };
+
+    return reviewInfo;
+}
+
+}
+
+module.exports = new CombineAI();

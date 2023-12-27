@@ -27,10 +27,6 @@ class UserService {
 
     if (!data.email.includes("@"))
       throw new CustomError("Please provide a valid email address", 400);
-    if (!data.firstName)
-      throw new CustomError("Please provide your first name", 400);
-    if (!data.lastName)
-      throw new CustomError("Please provide your last name", 400);
     if (!data.password) throw new CustomError("Please provide a password", 400);
 
     const devsensor_id = genDevSensorID(data.email);
@@ -41,9 +37,7 @@ class UserService {
       user_id,
       devsensor_id,
       username: `${data.email.split("@")[0]}` || "",
-      password: hash,
-      firstName: data.firstName,
-      lastName: data.lastName,
+      password: hash
     });
 
     const newDevice = new Device({
@@ -198,7 +192,7 @@ class UserService {
     const user = await User.findOne({ user_id });
     if (!user) throw new CustomError("User not found", 404);
     if (!data.fcm_token) throw new CustomError("Unable to regster device", 400);
-    const fcm_token = { device: "No_name", token: data.fcm_token };
+    const fcm_token = { device: "no_name", token: data.fcm_token };
     console.log({ fcm_token: data.fcm_token })
     const ifToken = user.fcm_token.some(
       (token) => token.token === data.fcm_token
