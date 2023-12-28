@@ -13,8 +13,8 @@ class WorkoutService {
   }
 
   async getWorkout( workout_id ){
-        const workout = await Workout.findOne({ workout_id });
-        if(!workout) throw new CustomError("This workout no longer exists.",400);
+        const workout = await Workout.findOne({ workout_id }) || null;
+        //if(!workout) throw new CustomError("This workout no longer exists.",400);
         return workout;
 
   }

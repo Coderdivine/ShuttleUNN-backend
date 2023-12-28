@@ -2,7 +2,6 @@ const response = require("../utils/response");
 const UserService = require("../services/user.service");
 const CustomError = require("../utils/custom-error");
 const Excerise = require("../services/excerise.service");
-
 class UserContoller {
 
     async register(req, res){
@@ -156,6 +155,14 @@ class UserContoller {
             const result = await Excerise.getWorkoutByUser_id(req.body.user_id);
             if(!result) throw new CustomError("Something went wrong. please try again later",400);
             res.status(201).send(response("Workout requested.",result));
+    }
+
+    async getWorkout(req, res) {
+        if(!req.body) throw new CustomError("There are issues with processing your request. Please try again later or log in.",400);
+            const result = await Excerise.getWorkout(req.body.excerise_id);
+            console.log({ result });
+            if(!result) throw new CustomError("Something went wrong. please try again later",400);
+            res.status(201).send(response("excerise requested.",result));
     }
 
     

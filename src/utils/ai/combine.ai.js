@@ -1,6 +1,7 @@
 require("dotenv").config();
 const open_ai = require("openai");
 const { AffectedBodyParts } = require("../../config");
+const CustomError = require("../custom-error");
 const apiKey = process.env.OPENAI_API_KEY;
 const openai = new open_ai({
   apiKey,

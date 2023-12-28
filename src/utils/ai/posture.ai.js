@@ -5,6 +5,7 @@ const openai = new open_ai({
   apiKey,
 });
 const { AffectedBodyParts } = require("../../config");
+const CustomError = require("../custom-error");
 
 
 
@@ -66,7 +67,7 @@ class PostureAI {
     });
 
     const responseMessage = response.choices[0].message;
-    console.log({ responseMessage });
+    console.log({ responseMessage })
 
     if (responseMessage.function_call) {
       const availableFunctions = {
@@ -75,6 +76,7 @@ class PostureAI {
       const functionName = responseMessage.function_call.name;
       const functionToCall = availableFunctions[functionName];
       const functionArgs = responseMessage.function_call.arguments;
+      console.log({ functionArgs })
 
       let parsedArgs;
         try {
@@ -98,6 +100,7 @@ class PostureAI {
         name: functionName,
         content: functionResponse,
       });
+      console.log({ parsedArgs })
 
       return parsedArgs;
     }
@@ -118,7 +121,7 @@ class PostureAI {
         areas
     };
 
-    return (reviewInfo);
+    return reviewInfo;
   }
 
   async createAlert(data) {
@@ -177,7 +180,6 @@ class PostureAI {
     });
 
     const responseMessage = response.choices[0].message;
-    console.log({ responseMessage });
 
     if (responseMessage.function_call) {
       const availableFunctions = {

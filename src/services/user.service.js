@@ -13,6 +13,7 @@ const randonNum = require("../utils/randonNum");
 const { sendMail, resetPassword } = require("../utils/sendMail");
 const { genDevSensorID } = require("../utils/genDevID");
 require("../utils/firebase");
+
 class UserService {
   async register(data) {
     if (!data.email) throw new CustomError("Please provide email address");

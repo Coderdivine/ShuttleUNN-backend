@@ -12,7 +12,7 @@ class WorkoutController {
 
     async getWorkout(req, res){
             const result = await WorkoutService.getWorkout(req.params.workout_id);
-            if(!result) throw new CustomError("Unable to get workout",400);
+            // if(!result) throw new CustomError("Unable to get workout",400);
             res.status(201).send(response("Workout",result));
     }
 

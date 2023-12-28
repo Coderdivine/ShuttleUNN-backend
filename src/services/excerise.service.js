@@ -4,6 +4,7 @@ const CustomError = require("../utils/custom-error");
 const uuid = require("uuid");
 const randonNum = require("../utils/randonNum");
 const WokroutAI = require("../utils/ai/workout.ai");
+const Excerise = require("../models/excerise.model");
 
 class Exercise {
 
@@ -15,14 +16,14 @@ class Exercise {
     if (!user_id)
       throw new CustomError("Please provide a user id", 400);
 
-    return await Workout.find({ user_id }).sort({ date: -1 }).limit(6);
+    return await Excerise.find({ user_id }).sort({ date: -1 }).limit(6);
   }
 
   async getWorkout(excerise_id) {
     if (!excerise_id)
       throw new CustomError("Please provide a excerise_id", 400);
 
-    return await Workout.findOne({ excerise_id });
+    return (await Excerise.findOne({ excerise_id }) )|| {};
   }
 
   async getLastWorkoutDetails(user_id) {

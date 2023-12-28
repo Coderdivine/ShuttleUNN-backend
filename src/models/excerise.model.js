@@ -12,6 +12,10 @@ const Excerise = new Schema({
     type: String,
     required: true,
   },
+  user_id:{
+    type:String,
+    required: false
+  },
   description: {
     type: String,
     required: true,
@@ -42,7 +46,7 @@ const Excerise = new Schema({
   },
   difficultyLevel:{
     type:String,
-    enum:["easy","soft","hard"],
+    enum: ["veryeasy", "easy", "normal", "hard", "veryhard"],
     default: "easy"
   },
   date: {

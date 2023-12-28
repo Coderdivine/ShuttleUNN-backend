@@ -5,6 +5,7 @@ const openai = new open_ai({
   apiKey,
 });
 const { AffectedBodyParts } = require("../../config");
+const CustomError = require("../custom-error");
 
 
 
@@ -15,17 +16,14 @@ class WorkoutAI {
     const current_date = Date.now();
     const createMessage = `Please act a proffessional workout instructor and assistance.
         Please create a workout based on this user's recent postures:
-        ${postures}. we these following workouts: ${lastWorkoutSent} on ${lastWorkoutDate} and its ${current_date}.
+        ${postures}. we sent these following workouts: ${lastWorkoutSent} on ${lastWorkoutDate} and its ${current_date}.
         make sure you return something different but related to the user's postures.    
         `;
     const messages = [{ role: "user", content: createMessage }];
     const functions = [
       {
         name: "create_workout",
-        description: `Please create a workout based on this user's recent postures:
-              ${postures}. we these following workouts: ${lastWorkoutSent} on ${lastWorkoutDate} and its ${current_date}.
-              make sure you return something different but related to the user's postures.
-              `,
+        description: `Please create a workout based on this user's recent postures:`,
         parameters: {
           type: "object",
           properties: {
@@ -81,15 +79,23 @@ class WorkoutAI {
     });
 
     const responseMessage = response.choices[0].message;
-    console.log({ responseMessage });
 
     if (responseMessage.function_call) {
       const availableFunctions = {
-        get_reviews: this.createWorkout,
+        create_workout: this.createWorkout,
       };
+
       const functionName = responseMessage.function_call.name;
       const functionToCall = availableFunctions[functionName];
-      const functionArgs = JSON.parse(responseMessage.function_call.arguments);
+      const functionArgs = responseMessage.function_call.arguments;
+      let parsedArgs;
+        try {
+            parsedArgs = JSON.parse(functionArgs);
+        } catch (error) {
+            console.error('Error parsing JSON arguments:', error.message);
+            throw new CustomError("Unable to parse JSON arguments.", 400);
+      }
+
       const functionResponse = functionToCall(
         parsedArgs.workout_name,
         parsedArgs.workout_description,
@@ -106,7 +112,7 @@ class WorkoutAI {
         content: functionResponse,
       });
 
-      return functionArgs;
+      return parsedArgs;
     }
   }
   
@@ -129,7 +135,7 @@ class WorkoutAI {
         areas
     };
 
-    return JSON.stringify(reviewInfo);
+    return (reviewInfo);
   }
 }
 
