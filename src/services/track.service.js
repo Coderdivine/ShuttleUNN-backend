@@ -161,7 +161,7 @@ class Track {
           data: {
             title,
             body: description,
-            icon: "https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FQLmBncEKNealXR8bM8x2%2Fuploads%2Fw60XCtPPJDQL1maTKHb7%2FDevSensorDarkMode1.jpg?alt=media&token=af815cc7-0eae-4d43-94a0-eff068689614",
+            icon: "https://pbs.twimg.com/profile_images/1710830966212620288/5UPzHw2W_400x400.jpg",
             link_url: link || URL?.DASHBOARD_URL,
           },
         };
@@ -237,9 +237,10 @@ class Track {
 
   getRandomNumberToAvg(avg) {
     return avg > 0 && Number.isInteger(avg)
-      ? Math.floor(Math.random() * avg) + 1
+      ? Math.floor(Math.random() * (avg/2)) + (avg/2) + 1
       : null;
   }
+  
 
   async isTimeToPushNotification(user_id) {
     const user = await User.findOne({ user_id });
@@ -288,10 +289,10 @@ class Track {
       lastSittingTime,
       period,
     } = data;
-    console.log({ data });
+    console.log({ data })
 
     // Check if the period in seconds is greater than 24hrs in seconds
-    const useTimer = period > 24 * 60 * 60;
+    const useTimer = period < 24 * 60 * 60;
 
     // const Countdowns = if initalCountdowns? create a function to map the values(Numbers) in descending order: else create a function to map the values(date) in descending order
     const initalCountdownsAvg = this.calculateAverage(initalCountdowns);
@@ -303,7 +304,7 @@ class Track {
       const randomMilliseconds =
         this.getRandomNumberToAvg(newInitalCountdowns[index]) * 1000;
       console.log({ randomMilliseconds, timestamp });
-      return new Date(timestamp).getTime()// + randomMilliseconds;
+      return new Date(timestamp).getTime() + randomMilliseconds;
     });
 
     console.log({ newdynamicCountdowns: newdynamicCountdowns.map((x) =>
@@ -325,14 +326,14 @@ class Track {
 
     // if useTimer is true and ((lastSittingTime from date to sec) < avg ) else (Date.now() < avg) = true;
     const firstCondition = Math.round(
-      Date.now() / 1000 - lastSittingTimenewDate / 1000
+      (Date.now() / 1000) - (lastSittingTimenewDate / 1000)
     );
 
     console.log({ firstCondition });
     console.log({ currentDate: Date.now() });
     console.log({ remaining: (Date.now() - avg) / 1000 })
     const isTimeToPush = useTimer
-      ? this.checkTime(firstCondition > avg ? false : true)
+      ? this.checkTime(firstCondition > avg ? true : false)
       : this.checkTime(Date.now() < avg ? false : true);
 
     console.log({ isTimeToPush });
@@ -351,7 +352,7 @@ class Track {
       const values = this.checkExpression(checkBoolean);
       console.log({ values });
 
-      console.log("Pushing message :::>");
+      console.log("Creating message :::>");
       const sendPushMessage = await this.releaseMessage(user_id);
       console.log({ sendPushMessage });
       return { timeUnit, values, Countdowns };
@@ -431,11 +432,11 @@ class Track {
     const result = [
       true,
       [
-        countdowns[0] >= countdowns[1],
+        false, //countdowns[0] >= countdowns[1],
         countdowns[0] - useValue >= countdowns[1],
       ],
       [
-        countdowns[1] >= countdowns[2],
+        false, //countdowns[1] >= countdowns[2],
         countdowns[1] - useValue >= countdowns[2],
       ],
     ];
@@ -486,7 +487,7 @@ class Track {
           postures: recentPostureIntext,
         });
         notificationType = "combined";
-        console.log({ i, notificationType, generatedContent })
+        console.log({ i, notificationType, generatedContent:{} })
       } else if (i === 2) {
         generatedContent = await WorkoutAI.generateWorkout({
           postures: recentPostureIntext,
@@ -504,8 +505,7 @@ class Track {
           instruction,
           difficultyLevel,
         } = generatedContent;
-        console.log({ generatedContentworkout: generatedContent });
-        console.log({ i, notificationType, generatedContent })
+        console.log({ i, notificationType, generatedContentworkout: generatedContent });
         const newWorkout = new ExceriseModel({
           excerise_id,
           user_id,
@@ -519,7 +519,6 @@ class Track {
         });
 
         const saved = await newWorkout.save();
-        console.log({ saved });
       } else if (i === 3) {
         generatedContent = 
         await PostureAI.createAlert({
@@ -580,7 +579,7 @@ class Track {
             alert_description,
           type: notificationType,
           nextNotification: new Date(nextNotificationDate),
-          date: new Date(nextNotificationDate),
+          date: new Date(Date.now()),
         });
   
         const saved = await newMessage.save();
@@ -624,7 +623,7 @@ class Track {
     });
     const workout = await ExceriseModel.find({ user_id }).sort({ date: -1 });
     const lastWorkoutInText = await this.recentWorkoutInText(workout);
-    console.log({ workout, lastWorkoutInText });
+    // console.log({ workout, lastWorkoutInText });
     return {
       lastWorkoutDate: lastWorkout?.date || new Date(Date.now()),
       lastWorkoutSent: lastWorkoutInText,
@@ -657,6 +656,7 @@ class Track {
         description: message.description,
         link: message.link,
       });
+
       const messageNotification = await Notifications.findOne({
         notification_id: message.notification_id,
       });

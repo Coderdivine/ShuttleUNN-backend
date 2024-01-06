@@ -6,29 +6,6 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const registrationToken = "eb1a2v7B2H8T4hVtUcY5Lb:APA91bFs39sQLhyPiSCGjTddG9iyo3sncMEaOTB2Px2cS-XTjWp21eCF0nfXOqN9iK0iKi99Rwq5MworION4ygsTRGW82TP9bIMurBXDs9i1_yHvAwOxLmifFL8fEcWZY9OYTua1T-xO"
-const message = {
-  token: registrationToken,
-  notification: {
-    title: "Greetings",
-    body: "Welcome to DevSensor."
-  },
-  data: {
-    icon: "https://devsensor.axgura.com/devsensor_logo_image.png",
-    link_url: "http://localhost:3000",
-  },
-};
-
-// admin
-//   .messaging()
-//   .send(message)
-//   .then((response) => {
-//     console.log("Successfully sent message:", response);
-//   })
-//   .catch((error) => {
-//     console.error("Error sending message:", error);
-//   });
-
 
 class PushMessage {
 
@@ -37,9 +14,8 @@ class PushMessage {
       const response = await admin
       .messaging()
       .send(message);
-      console.log({ workingReg: registrationToken });
       if(!response) throw new CustomError("Unable to send push message to user", 400);
-      console.log({ response });
+      console.log({ response: "MESSAGE SENT" });
       return response;
     }
 }
