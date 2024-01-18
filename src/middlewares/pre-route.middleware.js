@@ -18,7 +18,7 @@ module.exports = (app) => {
     app.use(cors({ origin: '*' }));
     
     // Secure the app by setting various HTTP headers off.
-    app.use(helmet({ contentSecurityPolicy: false }));
+    app.use(helmet({ contentSecurityPolicy: true }));
 
     // Logger
     app.use(morgan("common"));

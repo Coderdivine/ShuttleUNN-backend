@@ -6,9 +6,12 @@ const CustomError = require("../utils/custom-error");
 class DeviceService {
   async getDeviceDetails({ devsensor_id }) {
     const device = await Device.findOne({ devsensor_id });
+    const user = await User.findOne({ devsensor_id }) || { track_frequency: "60" };
+    
     if (!device) throw new CustomError("Device not activated yet.", 400);
-    return device;
-  }
+
+    return { ...device._doc, track_frequency: Number(user.track_frequency || "60") };
+}
 
   async updateDevice(devsensor_id, data) {
     const device = await Device.updateOne({ devsensor_id }, { $set: data });
