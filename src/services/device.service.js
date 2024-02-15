@@ -1,7 +1,10 @@
-const { BCRYPT_SALT } = require("../config");
+const { BCRYPT_SALT, URL } = require("../config");
 const User = require("../models/user.model");
 const Device = require("../models/device.model");
 const CustomError = require("../utils/custom-error");
+const { response } = require("express");
+const Posture = require("../models/posture.model");
+const PushNotification = require("../utils/firebase");
 
 class DeviceService {
   async getDeviceDetails({ devsensor_id }) {
@@ -116,6 +119,50 @@ class DeviceService {
     const user = await User.findOne({ devsensor_id });
     if (!user) throw new CustomError("User device disabled.", 400);
     return { message: "Disconnect Wifi not available." };
+  }
+
+  async onStart(devsensor_id) {
+     const user = await User.findOne({ devsensor_id });
+     if(!user) throw new CustomError("Can trace user to device_id", 400);
+     const devices = user?.fcm_token;
+      const sendNotificationPromises = [];
+     for (let i = 0; i < devices?.length; i++) {
+      const registrationToken = devices[i]?.token;
+      if (registrationToken.length > 10) {
+        const message = {
+          token: registrationToken,
+          notification: {
+            title:"Tracking started",
+            body:"Device is now tracking",
+          },
+          data: {
+            title:"Tracking started",
+            body:"Device is now tracking",
+            icon: "https://pbs.twimg.com/profile_images/1710830966212620288/5UPzHw2W_400x400.jpg",
+            link_url: URL?.DASHBOARD_URL,
+          },
+        };
+
+        const sendNotificationPromise = await PushNotification.sendMessage(
+          message
+        );
+        sendNotificationPromises.push(sendNotificationPromise);
+      }
+    }
+
+    const responses = await Promise.all(sendNotificationPromises);
+    return responses;
+  }
+
+  async isActive(devsensor_id) {
+    const user = await User.findOne({ devsensor_id });
+    if(!user) throw new CustomError("Can't trace device", 400);
+    const postures = await Posture.find({ devsensor_id }).sort({ date: -1 }).limit(1);
+    if(Date.now(postures[0].date) < (2 * 1000 * 60)){
+        return { bool: true };
+    } else {
+      return { bool: false };
+    }
   }
 }
 

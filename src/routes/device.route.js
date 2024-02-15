@@ -14,6 +14,8 @@ router.get("/track-frequency/:devsensor_id/:frequency", DeviceCtrl.trackFrequenc
 router.get("/disable-device/:devsensor_id", DeviceCtrl.disableDevice);
 router.get("/enable-device/:devsensor_id", DeviceCtrl.enableDevice);
 router.get("/disconnect-wifi/:devsensor_id", DeviceCtrl.disconnectWifi);
+router.get("/device-start/:devsensor_id", DeviceCtrl.onStart);
+router.get("/device-active/:devsensor_id", DeviceCtrl.isActive);
 
 
 

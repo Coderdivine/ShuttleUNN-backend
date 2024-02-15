@@ -53,7 +53,8 @@ class PostureService {
   }
 
   async postureSummary(user_id) {
-    const message = await Notification.findOne({ user_id }).sort({ date: -1 });
+    const message = await Notification.findOne({ user_id, type: "combined" }).sort({ date: -1 });
+    console.log({ message });
     return message;
   }
 
