@@ -165,6 +165,13 @@ class UserContoller {
             res.status(201).send(response("excerise requested.",result));
     }
 
+    async useProfileForWorkout(req, res) {
+            const result = await UserService.useProfileForWorkout(req.params.user_id);
+            if(!result) throw new CustomError("Something went wrong. please try again later",400);
+            const value = result?.useProfileForWorkout;
+            res.status(201).send(response(`profile wil; ${value?" be used":" not be used"} for excerise.`,result));
+    }
+
     
 }
 

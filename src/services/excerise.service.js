@@ -16,7 +16,7 @@ class Exercise {
     if (!user_id)
       throw new CustomError("Please provide a user id", 400);
 
-    return await Excerise.find({ user_id }).sort({ date: -1 }).limit(6);
+    return await Excerise.find({ user_id }).sort({ date: -1 }).limit(12);
   }
 
   async getWorkout(excerise_id) {

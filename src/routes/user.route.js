@@ -25,6 +25,8 @@ router.post("/edit-routine", UserCtrl.editUserRoutine);
 router.post("/delete-routine", UserCtrl.deleteFromUserRoutine);
 router.post("/get-workout-by-user", UserCtrl.getWorkoutByUser_id);
 router.post("/get-single-workout", UserCtrl.getWorkout);
+router.get("/use-profile/:user_id", UserCtrl.useProfileForWorkout);
+
 
 
 /* Enabling Google Auth Program */

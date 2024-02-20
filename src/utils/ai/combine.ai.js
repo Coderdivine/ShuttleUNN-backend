@@ -10,13 +10,14 @@ const openai = new open_ai({
 
 class CombineAI {
   
-  async combineAlert(data) {
-    const { postures } = data;
+async combineAlert(data) {
+    const { postures, profile } = data;
     const current_date = Date.now();
     const createMessage = `
-    Be a posture instructor. based on user posture, create a summary warning user about thier recent posture and also recommend a suitable workout based on that posture.
-    here's the user's recent posture:
-    ${postures}, current date: ${current_date}
+    Be a posture instructor. based on user's postures, create a summary warning user about his/her recent posture and also recommend a suitable workout based on the user's postures.
+    here's the user's recent postures:
+    ${postures}, current date: ${current_date}.
+    ${profile}
     `;
     const messages = [{ role: "user", content: createMessage }];
     const functions = [

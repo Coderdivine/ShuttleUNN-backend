@@ -13,14 +13,18 @@ const PushNotification = require("../utils/firebase");
 const { URL } = require("../config");
 const Posture = require("../models/posture.model");
 const { CombineAI, WorkoutAI, PostureAI } = require("../utils/ai");
+const WeeklyReport = require("../utils/weeklyImprovement");
 
 class Track {
+  
   async trackPosture(user_id, data) {
     const posture_id = uuid.v4();
     const {
       devsensor_id,
       posture_name,
       posture_accuracy,
+      posture_json,
+      format,
       camera_resolution,
       deviceX,
       deviceY,
@@ -35,21 +39,63 @@ class Track {
 
     const user = await User.findOne({ user_id });
     if (!user) throw new CustomError("User not located.", 400);
+     console.log({ data });
 
     const newPosture = await new Posture({
       posture_id,
       user_id,
       devsensor_id,
-      posture_name,
+      posture_name: posture_name || await this.createPostureName(posture_json) ,
       posture_accuracy,
       posture_rate,
       camera_resolution,
       deviceX,
+      posture_json,
+      format,
       deviceY,
       normalizedX,
       normalizedY,
       height,
       width,
+      trackInterval,
+      deviceType,
+    }).save();
+
+    const weeklyResponse = await this.sendWeeklyReport(user_id);
+    const isTime = await this.isTimeToPushNotification(user_id);
+    return {
+      isTime,
+      newPosture,
+      weeklyResponse
+    };
+  }
+
+  async createPostureName(json) {
+     const name = "Sitting poorly";
+     return name;
+  }
+
+  async trackPostureArray(user_id, data) {
+    const posture_id = uuid.v4();
+    const {
+      devsensor_id,
+      posture_array,
+      isArray,
+      camera_resolution,
+      trackInterval,
+      deviceType,
+    } = data;
+
+    const user = await User.findOne({ user_id });
+    if (!user) throw new CustomError("User not located.", 400);
+
+    const newPosture = await new Posture({
+      posture_id,
+      user_id,
+      isArray,
+      devsensor_id,
+      posture_array,
+      camera_resolution,
       trackInterval,
       deviceType,
     }).save();
@@ -469,11 +515,29 @@ class Track {
     }
   }
 
+  async useProfile(user_id) {
+    const user = await User.findOne({ user_id });
+    const profile = user?.useProfileForWorkout;
+    if(user && profile) {
+      const returnedText = `
+      Consider this information as a reference: the user's age is ${user?.age}, 
+      identified as ${user?.gender}, engaged in ${user?.occupation}
+      with a weight of ${user?.weight} and a height of ${user?.height}.
+      hobby: ${user?.hobby}.
+      `
+      console.log({ returnedText });
+        return returnedText;
+    } else {
+      return "";
+    }
+  }
+
   async sendNotification(user_id, value, timeUnit, Countdowns) {
     const msgLength = value?.length;
     const multipltBy = timeUnit === "sec" ? 1000 : 1;
     const recentPosture = await this.preciseCalculation(user_id);
     const recentPostureIntext = await this.recentPostureIntext(recentPosture);
+    const profile = await this.useProfile(user_id);
 
     if (!msgLength || msgLength > 3) return false;
 
@@ -485,6 +549,7 @@ class Track {
       if (i === 1) {
         generatedContent = await CombineAI.combineAlert({
           postures: recentPostureIntext,
+          profile
         });
         notificationType = "combined";
         console.log({ i, notificationType, generatedContent:{} })
@@ -493,6 +558,7 @@ class Track {
           postures: recentPostureIntext,
           difficultyLevel: "",
           ...this.getLastWorkoutDetails(user_id),
+          profile
         });
         notificationType = "workout";
         const excerise_id = uuid.v4();
@@ -523,6 +589,7 @@ class Track {
         generatedContent = 
         await PostureAI.createAlert({
           postures: recentPostureIntext,
+          profile
         });
         notificationType = "warning";
         console.log({ i, notificationType, generatedContent })
@@ -689,6 +756,13 @@ class Track {
       .limit(limit);
     console.log({ affected: await affected.map((x) => x.area) });
     return affected;
+  }
+
+  async sendWeeklyReport(user_id) {
+    const weekly_report = new WeeklyReport(Posture);
+    const response = await weekly_report.sendWeeklyImprovements(user_id);
+    if(!response) throw new CustomError("Unable to send weekly update", 400);
+    return response;
   }
 }
 

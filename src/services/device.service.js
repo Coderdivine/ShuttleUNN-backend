@@ -7,14 +7,21 @@ const Posture = require("../models/posture.model");
 const PushNotification = require("../utils/firebase");
 
 class DeviceService {
+
+
   async getDeviceDetails({ devsensor_id }) {
     const device = await Device.findOne({ devsensor_id });
-    const user = await User.findOne({ devsensor_id }) || { track_frequency: "60" };
-    
+    const user = (await User.findOne({ devsensor_id })) || {
+      track_frequency: "60",
+    };
+
     if (!device) throw new CustomError("Device not activated yet.", 400);
 
-    return { ...device._doc, track_frequency: Number(user.track_frequency || "60") };
-}
+    return {
+      ...device._doc,
+      track_frequency: Number(user.track_frequency || "60"),
+    };
+  }
 
   async updateDevice(devsensor_id, data) {
     const device = await Device.updateOne({ devsensor_id }, { $set: data });
@@ -122,22 +129,22 @@ class DeviceService {
   }
 
   async onStart(devsensor_id) {
-     const user = await User.findOne({ devsensor_id });
-     if(!user) throw new CustomError("Can trace user to device_id", 400);
-     const devices = user?.fcm_token;
-      const sendNotificationPromises = [];
-     for (let i = 0; i < devices?.length; i++) {
+    const user = await User.findOne({ devsensor_id });
+    if (!user) throw new CustomError("Can trace user to device_id", 400);
+    const devices = user?.fcm_token;
+    const sendNotificationPromises = [];
+    for (let i = 0; i < devices?.length; i++) {
       const registrationToken = devices[i]?.token;
       if (registrationToken.length > 10) {
         const message = {
           token: registrationToken,
           notification: {
-            title:"Tracking started",
-            body:"Device is now tracking",
+            title: "Tracking started",
+            body: "Device is now tracking",
           },
           data: {
-            title:"Tracking started",
-            body:"Device is now tracking",
+            title: "Tracking started",
+            body: "Device is now tracking",
             icon: "https://pbs.twimg.com/profile_images/1710830966212620288/5UPzHw2W_400x400.jpg",
             link_url: URL?.DASHBOARD_URL,
           },
@@ -156,14 +163,30 @@ class DeviceService {
 
   async isActive(devsensor_id) {
     const user = await User.findOne({ devsensor_id });
-    if(!user) throw new CustomError("Can't trace device", 400);
-    const postures = await Posture.find({ devsensor_id }).sort({ date: -1 }).limit(1);
-    if(Date.now(postures[0].date) < (2 * 1000 * 60)){
-        return { bool: true };
+    if (!user) throw new CustomError("Can't trace device", 400);
+
+    const postures = await Posture.find({ devsensor_id })
+      .sort({ date: -1 })
+      .limit(1);
+
+    const currentTime = Date.now();
+    const postureTime = new Date(postures[0].date).getTime();
+    const timeDifference = currentTime - postureTime;
+
+    console.log({
+      not_formatted: postures[0].date,
+      formatted: new Date(postureTime),
+      timeDifference: timeDifference,
+      check: 2700000
+    });
+
+    if (timeDifference < 2700000) {
+      return { bool: true };
     } else {
       return { bool: false };
     }
-  }
+}
+
 }
 
 module.exports = new DeviceService();

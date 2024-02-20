@@ -1,146 +1,164 @@
 const bcrypt = require("bcryptjs");
+const moment = require("moment");
 const mongoose = require("mongoose");
 // const { BCRYPT_SALT } = require("../config");
 const Schema = mongoose.Schema;
 const uuid = require("uuid");
 
-
 const UserSchema = new Schema(
   {
-    user_id:{
-        type:String,
-        required:true,
+    user_id: {
+      type: String,
+      required: true,
     },
-    firstName:{
-      type:String,
-      default:"No first name"
+    firstName: {
+      type: String,
+      default: "No first name",
     },
-    lastName:{
-      type:String,
-      default:"No last name"
+    lastName: {
+      type: String,
+      default: "No last name",
     },
-    devsensor_id:{
-      type:String,
-      default:uuid.v4()
+    devsensor_id: {
+      type: String,
+      default: uuid.v4(),
     },
-    username:{
-      type:String,
-      default:"No username"
+    username: {
+      type: String,
+      default: "No username",
     },
-    email:{
-      type:String,
-      required:true
+    email: {
+      type: String,
+      required: true,
     },
-    emailVerified:{
-      type:Boolean,
-      default:true 
+    emailVerified: {
+      type: Boolean,
+      default: true,
     },
-    isSuspended:{
-      type:Boolean,
-      default:false 
+    isSuspended: {
+      type: Boolean,
+      default: false,
     },
-    password:{
-      type:String,
-      required:true
+    password: {
+      type: String,
+      required: true,
     },
-    gender:{
-      type:String,
-      default:"No gender"
+    gender: {
+      type: String,
+      default: "No gender",
     },
-    age:{
-      type:String,
-      default:"No age"
+    age: {
+      type: String,
+      default: "No age",
     },
-    occupation:{
-      type:String,
-      default:"No occupation"
+    occupation: {
+      type: String,
+      default: "No occupation",
     },
-    height:{
-      type:String,
-      default:"No height"
+    height: {
+      type: String,
+      default: "No height",
     },
-    weight:{
-      type:String,
-      default:"No weight"
+    weight: {
+      type: String,
+      default: "No weight",
     },
-    dominantHand:{
-      type:String,
-      default:"right"
+    dominantHand: {
+      type: String,
+      default: "right",
     },
-    dailyRoutine:[
-        {
-          routine_id:String,
-          routine:String,
-          time:String,
-          date:String,
-        }
-    ],
-    savedWorkout:[
+    dailyRoutine: [
       {
-        workout_id:{
-          type:String,
-          required:true
-        },
-        timeRange:{
-          type:Number 
-        },
-        title:{
-          type:String,
-          required:true
-        },
-        description:{
-          type:String,
-          required:true
-        },
-        media:{
-          type:String,
-          required:true
-        }
-      }
+        routine_id: String,
+        routine: String,
+        time: String,
+        date: String,
+      },
     ],
-    isLinked:{
-      type:Boolean,
-      default:false
+    savedWorkout: [
+      {
+        workout_id: {
+          type: String,
+          required: true,
+        },
+        timeRange: {
+          type: Number,
+        },
+        title: {
+          type: String,
+          required: true,
+        },
+        description: {
+          type: String,
+          required: true,
+        },
+        media: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    isLinked: {
+      type: Boolean,
+      default: false,
     },
-    track_frequency:{
-        type:String,
-        default:60
+    track_frequency: {
+      type: String,
+      default: 60,
     },
-    initialAuthentication:{
-      type:String,
-      default:"devsensor"
+    initialAuthentication: {
+      type: String,
+      default: "devsensor",
     },
-    authenticatedWith:{
-      type:String,
-      default:"devsensor"
+    authenticatedWith: {
+      type: String,
+      default: "devsensor",
     },
-    joined:{
-      type:Date,
-      default:Date.now()
+    joined: {
+      type: Date,
+      default: Date.now(),
     },
-    lastLogin:{
-      type:Date,
-      default:Date.now()
+    lastLogin: {
+      type: Date,
+      default: Date.now(),
     },
-    alertInterval:{
-      type:Number,
-      default:20
+    alertInterval: {
+      type: Number,
+      default: 20,
     },
-    workoutAlert:{
-      type:Number,
-      default:20
+    workoutAlert: {
+      type: Number,
+      default: 20,
     },
     fcm_token: {
-      type:[{
-        device:String,
-        token:String
-      }],
-      default:[
+      type: [
         {
-          device:"NO_DEVICE",
-          token:""
-        }
-      ]
+          device: String,
+          token: String,
+        },
+      ],
+      default: [
+        {
+          device: "NO_DEVICE",
+          token: "",
+        },
+      ],
+    },
+    hobby:{
+      type:String,
+      default: "No hobby"
+    },
+    useProfileForWorkout: {
+      type: Boolean,
+      default: false,
+    },
+    lastMessageSentDate:{
+      type:Date,
+      default: moment().toISOString() 
+    },
+    enableWeeklyReport:{
+      type: Boolean,
+      default: true
     }
   },
   {

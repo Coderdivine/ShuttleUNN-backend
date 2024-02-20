@@ -19,15 +19,15 @@ const Posture = new Schema(
     },
     posture_name: {
       type: String,
-      required: true,
+      required: false,
     },
     posture_accuracy: {
       type: Number,
-      required: true,
+      required: false,
     },
     posture_rate: {
       type: Number,
-      required: true,
+      required: false,
     },
     date: {
       type: Date,
@@ -39,31 +39,31 @@ const Posture = new Schema(
     },
     camera_resolution:{
       type:String,
-      required: true
+      required: false
     },
     deviceX:{
       type:String,
-      required: true 
+      required: false 
     },
     deviceY:{
       type:String,
-      required: true
+      required: false
     },
     normalizedX:{
       type:Number,
-      required: true
+      required: false
     },
     normalizedY:{
       type:String,
-      required: true
+      required: false
     },
     height:{
       type:String,
-      required: true 
+      required: false 
     },
     width:{
       type:String,
-      required: true
+      required: false
     },
     trackInterval:{
       type:Number,
@@ -72,6 +72,23 @@ const Posture = new Schema(
     deviceType:{
       type:String,
       required: true
+    },
+    isArray:{
+      type:Boolean,
+      default: false
+    },
+    posture_array: {
+      type: Array,
+      required: false
+    },
+    posture_json: {
+      type: String,
+      required: false
+    },
+    format: {
+      type: String,
+      enum: [ "text", "json" ],
+      default: "text"
     }
   },
   {

@@ -318,6 +318,16 @@ class UserService {
 
     return deleted;
   }
+
+  async useProfileForWorkout(user_id) {
+      const user = await User.findOne({ user_id });
+      if(!user) throw new CustomError("No user found. Login again", 400);
+      const value = user?.useProfileForWorkout;
+      user.useProfileForWorkout = !value;
+      console.log({ useProfile: user.useProfileForWorkout });
+      const saved = await user.save();
+      return saved;
+  }
 }
 
 module.exports = new UserService();

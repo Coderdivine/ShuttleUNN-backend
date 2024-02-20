@@ -11,13 +11,14 @@ const CustomError = require("../custom-error");
 
 class WorkoutAI {
   async generateWorkout(data) {
-    const { postures, difficultyLevel, lastWorkoutDate, lastWorkoutSent } =
+    const { postures, difficultyLevel, lastWorkoutDate, lastWorkoutSent, profile } =
       data;
     const current_date = Date.now();
-    const createMessage = `Please act a proffessional workout instructor and assistance.
+    const createMessage = `Please act as a proffessional workout instructor and assistant.
         Please create a workout based on this user's recent postures:
-        ${postures}. we sent these following workouts: ${lastWorkoutSent} on ${lastWorkoutDate} and its ${current_date}.
-        make sure you return something different but related to the user's postures.    
+        ${postures}. we sent these following workouts recently: ${lastWorkoutSent} on ${lastWorkoutDate} and its ${current_date}.
+        make sure you return something different but related to the current user's postures.
+        ${profile}    
         `;
     const messages = [{ role: "user", content: createMessage }];
     const functions = [
