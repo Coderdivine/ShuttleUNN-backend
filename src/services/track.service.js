@@ -14,9 +14,9 @@ const { URL } = require("../config");
 const Posture = require("../models/posture.model");
 const { CombineAI, WorkoutAI, PostureAI } = require("../utils/ai");
 const WeeklyReport = require("../utils/weeklyImprovement");
+const Pose = require("../utils/Pose");
 
 class Track {
-  
   async trackPosture(user_id, data) {
     const posture_id = uuid.v4();
     const {
@@ -39,13 +39,14 @@ class Track {
 
     const user = await User.findOne({ user_id });
     if (!user) throw new CustomError("User not located.", 400);
-     console.log({ data });
+    console.log({ data });
 
     const newPosture = await new Posture({
       posture_id,
       user_id,
       devsensor_id,
-      posture_name: posture_name || await this.createPostureName(posture_json) ,
+      posture_name:
+        posture_name || (await this.createPostureName(posture_json)),
       posture_accuracy,
       posture_rate,
       camera_resolution,
@@ -66,13 +67,22 @@ class Track {
     return {
       isTime,
       newPosture,
-      weeklyResponse
+      weeklyResponse,
     };
   }
 
   async createPostureName(json) {
-     const name = "Sitting poorly";
-     return name;
+    const exampleKeypoints = {
+      leftshoulder: { x: 10, y: 20 },
+      rightshoulder: { x: 30, y: 20 },
+      leftelbow: { x: 5, y: 15 },
+      rightelbow: { x: 35, y: 15 },
+      waist: { x: 20, y: 40 },
+      neck: { x: 20, y: 10 },
+    };
+    const postureName = new Pose(exampleKeypoints);
+    const name = postureName.calculatePose() || "Sitting poorly";
+    return name;
   }
 
   async trackPostureArray(user_id, data) {
@@ -283,10 +293,9 @@ class Track {
 
   getRandomNumberToAvg(avg) {
     return avg > 0 && Number.isInteger(avg)
-      ? Math.floor(Math.random() * (avg/2)) + (avg/2) + 1
+      ? Math.floor(Math.random() * (avg / 2)) + avg / 2 + 1
       : null;
   }
-  
 
   async isTimeToPushNotification(user_id) {
     const user = await User.findOne({ user_id });
@@ -335,7 +344,7 @@ class Track {
       lastSittingTime,
       period,
     } = data;
-    console.log({ data })
+    console.log({ data });
 
     // Check if the period in seconds is greater than 24hrs in seconds
     const useTimer = period < 24 * 60 * 60;
@@ -353,9 +362,12 @@ class Track {
       return new Date(timestamp).getTime() + randomMilliseconds;
     });
 
-    console.log({ newdynamicCountdowns: newdynamicCountdowns.map((x) =>
-      moment(x).format("YYYY-MM-DD hh:mm:ss.SSS A")
-    ), newInitalCountdowns });
+    console.log({
+      newdynamicCountdowns: newdynamicCountdowns.map((x) =>
+        moment(x).format("YYYY-MM-DD hh:mm:ss.SSS A")
+      ),
+      newInitalCountdowns,
+    });
     const Countdowns = useTimer ? newInitalCountdowns : newdynamicCountdowns;
 
     const timeUnit = useTimer ? "sec" : "millseconds";
@@ -367,17 +379,22 @@ class Track {
       ? this.calculateAverage(Countdowns)
       : this.calculateAverageDate(Countdowns);
     const lastSittingTimenewDate = new Date(lastSittingTime).getTime();
-    console.log({ avg: useTimer ? avg: moment(avg).format("YYYY-MM-DD hh:mm:ss.SSS A"), lastSittingTimenewDate });
-    console.log({ currentDate: moment(Date.now()).format("YYYY-MM-DD hh:mm:ss.SSS A") })
+    console.log({
+      avg: useTimer ? avg : moment(avg).format("YYYY-MM-DD hh:mm:ss.SSS A"),
+      lastSittingTimenewDate,
+    });
+    console.log({
+      currentDate: moment(Date.now()).format("YYYY-MM-DD hh:mm:ss.SSS A"),
+    });
 
     // if useTimer is true and ((lastSittingTime from date to sec) < avg ) else (Date.now() < avg) = true;
     const firstCondition = Math.round(
-      (Date.now() / 1000) - (lastSittingTimenewDate / 1000)
+      Date.now() / 1000 - lastSittingTimenewDate / 1000
     );
 
     console.log({ firstCondition });
     console.log({ currentDate: Date.now() });
-    console.log({ remaining: (Date.now() - avg) / 1000 })
+    console.log({ remaining: (Date.now() - avg) / 1000 });
     const isTimeToPush = useTimer
       ? this.checkTime(firstCondition > avg ? true : false)
       : this.checkTime(Date.now() < avg ? false : true);
@@ -456,7 +473,7 @@ class Track {
         countdowns[0] / (initalCountdownsAvg - 4) >= countdowns[1],
       ],
       [
-        false,// countdowns[1] >= countdowns[2],
+        false, // countdowns[1] >= countdowns[2],
         countdowns[1] / (initalCountdownsAvg - 4) >= countdowns[2],
       ],
     ];
@@ -472,9 +489,9 @@ class Track {
     console.log({
       useValue: moment(useValue).format("YYYY-MM-DD hh:mm:ss.SSS A"),
     });
-      countdowns.map((x) =>
-        console.log(moment(x).format("YYYY-MM-DD hh:mm:ss.SSS A"))
-      )
+    countdowns.map((x) =>
+      console.log(moment(x).format("YYYY-MM-DD hh:mm:ss.SSS A"))
+    );
     const result = [
       true,
       [
@@ -518,15 +535,15 @@ class Track {
   async useProfile(user_id) {
     const user = await User.findOne({ user_id });
     const profile = user?.useProfileForWorkout;
-    if(user && profile) {
+    if (user && profile) {
       const returnedText = `
       Consider this information as a reference: the user's age is ${user?.age}, 
       identified as ${user?.gender}, engaged in ${user?.occupation}
       with a weight of ${user?.weight} and a height of ${user?.height}.
       hobby: ${user?.hobby}.
-      `
+      `;
       console.log({ returnedText });
-        return returnedText;
+      return returnedText;
     } else {
       return "";
     }
@@ -545,20 +562,20 @@ class Track {
 
     const generateNotification = async (i) => {
       let generatedContent, notificationType;
-      console.log({ i })
+      console.log({ i });
       if (i === 1) {
         generatedContent = await CombineAI.combineAlert({
           postures: recentPostureIntext,
-          profile
+          profile,
         });
         notificationType = "combined";
-        console.log({ i, notificationType, generatedContent:{} })
+        console.log({ i, notificationType, generatedContent: {} });
       } else if (i === 2) {
         generatedContent = await WorkoutAI.generateWorkout({
           postures: recentPostureIntext,
           difficultyLevel: "",
           ...this.getLastWorkoutDetails(user_id),
-          profile
+          profile,
         });
         notificationType = "workout";
         const excerise_id = uuid.v4();
@@ -571,7 +588,11 @@ class Track {
           instruction,
           difficultyLevel,
         } = generatedContent;
-        console.log({ i, notificationType, generatedContentworkout: generatedContent });
+        console.log({
+          i,
+          notificationType,
+          generatedContentworkout: generatedContent,
+        });
         const newWorkout = new ExceriseModel({
           excerise_id,
           user_id,
@@ -586,19 +607,18 @@ class Track {
 
         const saved = await newWorkout.save();
       } else if (i === 3) {
-        generatedContent = 
-        await PostureAI.createAlert({
+        generatedContent = await PostureAI.createAlert({
           postures: recentPostureIntext,
-          profile
+          profile,
         });
         notificationType = "warning";
-        console.log({ i, notificationType, generatedContent })
+        console.log({ i, notificationType, generatedContent });
       }
 
       if (!generatedContent && i !== 0)
         throw new CustomError("Unable to generate content.", 400);
 
-      if(i !== 0) {
+      if (i !== 0) {
         const {
           summary,
           notification_description,
@@ -619,9 +639,11 @@ class Track {
           alert_notification_text,
           damageLevel: alertDamageLevel,
         } = generatedContent;
-  
+
         const nextNotificationDate =
-          timeUnit === "sec" ? Date.now() + Countdowns[i] * 1000 : Countdowns[i];
+          timeUnit === "sec"
+            ? Date.now() + Countdowns[i] * 1000
+            : Countdowns[i];
         const saveAffected = await new Affected({
           afftected_id: uuid.v4(),
           area: areas,
@@ -648,15 +670,15 @@ class Track {
           nextNotification: new Date(nextNotificationDate),
           date: new Date(Date.now()),
         });
-  
+
         const saved = await newMessage.save();
         return saved;
       }
-      return {}
+      return {};
     };
 
     const generatePromises = Array.from({ length: msgLength }, (_, i) =>
-      generateNotification(i+1)
+      generateNotification(i + 1)
     );
 
     const generatedNotifications = await Promise.all(generatePromises);
@@ -761,7 +783,7 @@ class Track {
   async sendWeeklyReport(user_id) {
     const weekly_report = new WeeklyReport(Posture);
     const response = await weekly_report.sendWeeklyImprovements(user_id);
-    if(!response) throw new CustomError("Unable to send weekly update", 400);
+    if (!response) throw new CustomError("Unable to send weekly update", 400);
     return response;
   }
 }
