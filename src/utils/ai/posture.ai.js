@@ -27,11 +27,23 @@ class PostureAI {
           properties: {
             warning: {
               type: "string",
-              description: `Create a posture warning. make sure it doesn't excceds 60 characters`,
+              description: `Create a posture warning. make sure it doesn't excceds 60 characters, for example: 1. You've been slouching for 2mins, 2. Your neck is stiff. Just come up with something similar to these examples, making sure it's based on the given posture and date/time.`,
             },
             warning_description: {
               type: "string",
-              description: `Create posture warning description. make this brief as possible while coveying the warning properly`,
+              description: `Create posture warning description. make this brief as possible while coveying the warning properly, For example:
+              Your left arm has been at a bad angle; try sitting upright.
+              Stand up and walk around to enhance productivity.
+              Your body angle shows you've been slouching.
+              You've been sitting properly for 2 minutes; keep it up!.
+              Try ensuring that your left shoulder is at an angle of <degree>.
+              Your neck has been stiff.
+              Make both of your shoulders at the same angle and height.
+              Based on your waist angle, you've been sitting without back support.
+              Please lean your back on a chair.
+              
+
+              Just come up with something similar to these examples, making sure it's based on the given posture and date/time.`,
             },
             warning_notification_text: {
               type: "string",

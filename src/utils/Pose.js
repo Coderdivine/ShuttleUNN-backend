@@ -1,124 +1,136 @@
+const CustomError = require("./custom-error");
+
 class PoseCalculator {
+  
   constructor(keypoints) {
     this.keypoints = keypoints;
-    console.log({ keypoints });
+    return this;
   }
 
-  keypointsExist() {
-    return this.keypoints;
-    // &&
-    // this.keypoints.every((point) => point && typeof point === 'object' && 'x' in point && 'y' in point)
-  }
+  async getPosture(bodyparts, width, height) {
+    const requiredParts = [
+      "leftshoulders",
+      "leftarm",
+      "rightarm",
+      "rightshoulders",
+      "lefthand",
+      "righthand",
+    ];
 
-  calculateAngle(point1, point2) {
-    // return Math.atan2(point2.y - point1.y, point2.x - point1.x);
-    const angle =
-      ((Math.atan2(point2.y - point1.y, point2.x - point1.x) * 180) / Math.PI +
-        360) %
-      360;
-    return angle;
-  }
-
-  calculateDistance(point1, point2) {
-    return Math.sqrt(
-      Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2)
+    const missingParts = requiredParts.filter(
+      (part) => !bodyparts.some((bp) => bp.label === part)
     );
+
+    await Promise.all(
+      missingParts.map(async (part) => {
+        const foundPart = part.startsWith("left")
+          ? await this.detectLeft(part, bodyparts, width, height)
+          : await this.detectRight(part, bodyparts, width, height);
+        if (foundPart) bodyparts.push(foundPart);
+      })
+    );
+
+    console.log({ bodyparts });
+    return bodyparts;
   }
 
-  scaleDistance(distance, scalingFactor) {
-    return distance * scalingFactor;
-  }
+  detectRight(findpart, body, width, height) {
+    const centerX = width / 2;
+    const leftSide = "left" + findpart.substring(5);
+    console.log("Detecting " + findpart + " with " + leftSide);
 
-  handle2DLimitations() {
-    // Your implementation to handle 2D limitations
-    // This could involve predicting occluded keypoints or correcting for perspective distortion
-  }
+    let findLeftside = body?.filter((part) => part["label"] == leftSide);
 
-  calculatePose() {
-    if (!this.keypointsExist()) {
-      console.error("Keypoints do not exist or are not valid.");
-      return null;
+    if (!Array.isArray(findLeftside)) {
+      findLeftside = findLeftside ? [findLeftside] : [];
     }
 
-    const { leftshoulder, rightshoulder, leftelbow, rightelbow, waist, neck } =
-      this.keypoints;
+    const findpartResult = findLeftside.filter((part) => part.x > centerX);
+    return findpartResult.length > 0
+      ? { ...findpartResult[0], label: findpart }
+      : null;
+  }
 
-    const LSA = this.calculateAngle(leftshoulder, neck);
-    const RSA = this.calculateAngle(rightshoulder, neck);
-    const LEA = this.calculateAngle(leftelbow, leftshoulder);
-    const REA = this.calculateAngle(rightelbow, rightshoulder);
-    const WHA = this.calculateAngle(waist, neck);
+  detectLeft(findpart, body, width, height) {
+    const centerX = width / 2;
+    const rightSide = "right" + findpart.substring(4);
+    console.log("Detecting " + findpart + " with " + rightSide);
 
-    const LSLED = this.calculateDistance(leftshoulder, leftelbow);
-    const RSRED = this.calculateDistance(rightshoulder, rightelbow);
+    let findrightside = body?.filter((part) => part["label"] == rightSide);
 
-    const scalingFactor = 1.0;
+    if (!Array.isArray(findrightside)) {
+      findrightside = findrightside ? [findrightside] : [];
+    }
 
-    const scaledLSLED = this.scaleDistance(LSLED, scalingFactor);
-    const scaledRSRED = this.scaleDistance(RSRED, scalingFactor);
+    const findpartResult = findrightside.filter((part) => part.x < centerX);
+    return findpartResult.length > 0
+      ? { ...findpartResult[0], label: findpart }
+      : null;
+  }
 
-    this.handle2DLimitations();
+  calculateCenter(bb) {
+    return { x: bb.x + bb.width / 2, y: bb.y + bb.height / 2 };
+  }
 
-    const posture_name = this.createPostureName({
-      LSA,
-      RSA,
-      LEA,
-      REA,
-      WHA,
-      LSLED,
-      RSRED,
-      scaledLSLED,
-      scaledRSRED,
+  calculateAngle(p1, p2) {
+    return (Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180.0) / Math.PI;
+  }
+
+  async finalPosture(posture_json, width, height) {
+    const postures_bounding_box = await this.getPosture(
+      posture_json,
+      width,
+      height
+    );
+    const postures_keypoints = postures_bounding_box.map((bb) => {
+      const { x, y } = this.calculateCenter(bb);
+      return { ...bb, x, y };
     });
 
+    const getAngle = (label1, label2) => {
+      const point1 = postures_keypoints.find((x) => x?.label === label1);
+      const point2 = postures_keypoints.find((x) => x?.label === label2);
+      return point1 && point2 ? this.calculateAngle(point1, point2) : null;
+    };
+
+    const angles = {
+      neckAngle: getAngle("head", "neck"),
+      leftShoulderAngle: getAngle("neck", "leftshoulders"),
+      rightShoulderAngle: getAngle("neck", "rightshoulders"),
+      leftArmAngle: getAngle("leftshoulders", "leftarm"),
+      rightArmAngle: getAngle("rightshoulders", "rightarm"),
+      leftHandAngle: getAngle("leftarm", "lefthand"),
+      rightHandAngle: getAngle("rightarm", "righthand"),
+      waistAngle: getAngle("neck", "waist"),
+    };
+
+    console.log({ angles })
+
+    const formatAngle = (angle) => (angle ? `${angle} degrees` : "No detected");
+
+    const posture_name = `
+    neckAngle => ${formatAngle(angles.neckAngle)},
+    leftShoulderAngle => ${formatAngle(angles.leftShoulderAngle)},
+    rightShoulderAngle => ${formatAngle(angles.rightShoulderAngle)},
+    leftArmAngle => ${formatAngle(angles.leftArmAngle)},
+    rightArmAngle => ${formatAngle(angles.rightArmAngle)},
+    leftHandAngle => ${formatAngle(angles.leftHandAngle)},
+    rightHandAngle => ${formatAngle(angles.rightHandAngle)},
+    waistAngle => ${formatAngle(angles.waistAngle)},
+    `;
+
+
+
     return {
-      LSA,
-      RSA,
-      LEA,
-      REA,
-      WHA,
-      LSLED,
-      RSRED,
-      scaledLSLED,
-      scaledRSRED,
+      new_json: postures_keypoints,
       posture_name,
     };
   }
-
-  createPostureName(calculatedPose) {
-    const lsa = `Left shoulder angle is ${
-      calculatedPose?.LSA || "could not be calculated"
-    }`;
-    const rsa = `Right shoulder angle is ${
-      calculatedPose?.RSA || "could not be calculated"
-    }`;
-    const lea = `Left Elbow angle is ${
-      calculatedPose?.LEA || "could not be calculated"
-    }`;
-    const rea = `Right Elbow angle is ${
-      calculatedPose?.REA || "could not be calculated"
-    }`;
-    const wha = `Left shoulder angle is ${
-      calculatedPose?.WHA || "could not be calculated"
-    }`;
-    const posture_name = `
-            Posture: ${wha}, ${lsa}, ${rsa}, ${lea} and ${rea}.
-        `;
-    return posture_name;
-  }
 }
 
-const exampleKeypoints = {
-  leftshoulder: { x: 10, y: 20 },
-  rightshoulder: { x: 30, y: 20 },
-  leftelbow: { x: 5, y: 15 },
-  rightelbow: { x: 35, y: 15 },
-  waist: { x: 20, y: 40 },
-  neck: { x: 20, y: 10 },
-};
 
-const poseCalculator = new PoseCalculator(exampleKeypoints);
-const calculatedPose = poseCalculator.calculatePose();
-console.log({ calculatedPose });
+
+const poseCalculator = new PoseCalculator({});
+
 
 module.exports = PoseCalculator;

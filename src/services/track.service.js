@@ -17,6 +17,7 @@ const WeeklyReport = require("../utils/weeklyImprovement");
 const Pose = require("../utils/Pose");
 
 class Track {
+
   async trackPosture(user_id, data) {
     const posture_id = uuid.v4();
     const {
@@ -39,19 +40,21 @@ class Track {
 
     const user = await User.findOne({ user_id });
     if (!user) throw new CustomError("User not located.", 400);
-    console.log({ data });
 
     const newPosture = await new Posture({
       posture_id,
       user_id,
       devsensor_id,
       posture_name:
-        posture_name || (await this.createPostureName(posture_json)),
+        posture_name ||
+        (
+          await this.createPostureName(posture_json, width, height)
+        ).posture_name,
       posture_accuracy,
       posture_rate,
       camera_resolution,
       deviceX,
-      posture_json,
+      posture_json: JSON.stringify(posture_json),
       format,
       deviceY,
       normalizedX,
@@ -71,18 +74,19 @@ class Track {
     };
   }
 
-  async createPostureName(json) {
-    const exampleKeypoints = {
-      leftshoulder: { x: 10, y: 20 },
-      rightshoulder: { x: 30, y: 20 },
-      leftelbow: { x: 5, y: 15 },
-      rightelbow: { x: 35, y: 15 },
-      waist: { x: 20, y: 40 },
-      neck: { x: 20, y: 10 },
-    };
-    const postureName = new Pose(exampleKeypoints);
-    const name = postureName.calculatePose() || "Sitting poorly";
-    return name;
+  async createPostureName(json, width, height) {
+    // const json = JSON.parse(json);
+    const postureName = new Pose({});
+    const {
+      posture_name,
+      new_json
+    } = await postureName.finalPosture(json || json, width, height) || "Sitting poorly";
+
+    console.log({ posture_name });
+    return {
+      posture_name,
+      new_json
+    } ;
   }
 
   async trackPostureArray(user_id, data) {
@@ -542,7 +546,7 @@ class Track {
       with a weight of ${user?.weight} and a height of ${user?.height}.
       hobby: ${user?.hobby}.
       `;
-      console.log({ returnedText });
+      console.log({ Profile: returnedText });
       return returnedText;
     } else {
       return "";
@@ -770,15 +774,23 @@ class Track {
       user?.workoutAlert,
       user.alertInterval,
     ]);
+
     const limit = Math.round(intervalAvg / user?.track_frequency);
     console.log({ intervalAvg, limit });
 
-    const affected = await Affected.find({ user_id })
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  
+    const affected = await Affected.find({ 
+      user_id,
+      date: { $gte: oneWeekAgo }
+    })
       .sort({ date: -1 })
       .limit(limit);
     console.log({ affected: await affected.map((x) => x.area) });
     return affected;
-  }
+  };
+  
 
   async sendWeeklyReport(user_id) {
     const weekly_report = new WeeklyReport(Posture);

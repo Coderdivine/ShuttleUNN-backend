@@ -31,15 +31,17 @@ async combineAlert(data) {
                 properties: {
                     summary: {
                         type: "string",
-                        description: `Create a notification summary. make sure it doesn't exceed 60 words`,
+                        description: `Create a notification summary based on user posture and actual date/time. make sure it doesn't exceed 60 words
+                        
+                        `,
                     },
                     notification_notification_text: {
                         type: "string",
-                        description: `Create the notification summary title. make sure the sentence doesn't exceed 50 words.`,
+                        description: `Create the notification summary title. make sure the sentence doesn't exceed 50 words,  for example: 1. time for a simple workout to keep you going, 2. This workout will keep you going 3. perform this 3mins workout. Just come up with something similar to these examples, making sure it's based on the given posture and date/time`,
                     },
                     notification_description: {
                         type: "string",
-                        description: `Create notification summary description. give some exercise to do and make it detailed if possible`,
+                        description: `Create notification summary description. give some exercise to do and make it detailed workout.`,
                     },
                     importance: {
                         type: "string",
