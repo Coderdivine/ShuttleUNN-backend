@@ -2,6 +2,7 @@ require("dotenv").config();
 const CombineAI = require("./combine.ai");
 const WorkoutAI = require("./workout.ai");
 const PostureAI = require("./posture.ai");
+const useMessageAI = require("./Message.ai");
 const open_ai = require("openai");
 const apiKey = process.env.OPENAI_API_KEY;
 const openai = new open_ai({
@@ -110,5 +111,6 @@ module.exports = {
     useAi,
     CombineAI,
     WorkoutAI,
-    PostureAI
+    PostureAI,
+    useMessageAI
  };

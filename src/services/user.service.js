@@ -328,6 +328,22 @@ class UserService {
       const saved = await user.save();
       return saved;
   }
+
+
+  async useMagicFix(user_id) {
+    const user = await User.findOne({ user_id });
+    if(!user) throw new CustomError("User not found", 400);
+    const magicFix = !user?.enableMagicFix;
+    user.enableMagicFix = magicFix;
+    await user.save();
+    return { magicFix }
+  } 
+
+  async magicFixEnabled(user_id) {
+    const user = await User.findOne({ user_id });
+    if(!user) throw new CustomError("User not found", 400);
+    return user?.enableMagicFix;
+  }
 }
 
 module.exports = new UserService();

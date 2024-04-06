@@ -696,9 +696,10 @@ class Track {
     return posture
       .map(
         (p) =>
-          `-> had body posture: ${p.posture_name} at ${p.posture_accuracy}% accuracy on ${p.date}. ;`
+          `-> had body posture: ${p.posture_name}  on ${p.date}. ;`
       )
       .join("");
+      //at ${p.posture_accuracy}% accuracy
   }
 
   async recentWorkoutInText(workout) {

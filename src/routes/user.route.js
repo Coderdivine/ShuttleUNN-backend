@@ -26,6 +26,8 @@ router.post("/delete-routine", UserCtrl.deleteFromUserRoutine);
 router.post("/get-workout-by-user", UserCtrl.getWorkoutByUser_id);
 router.post("/get-single-workout", UserCtrl.getWorkout);
 router.get("/use-profile/:user_id", UserCtrl.useProfileForWorkout);
+router.get("/magic-fix/:user_id", UserCtrl.magicFixEnabled);
+router.get("/use-magic-fix/:user_id", UserCtrl.useMagicFix);
 
 
 

@@ -159,6 +159,10 @@ const UserSchema = new Schema(
     enableWeeklyReport:{
       type: Boolean,
       default: true
+    },
+    enableMagicFix:{
+      type: Boolean,
+      default: false
     }
   },
   {

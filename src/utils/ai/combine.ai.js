@@ -31,7 +31,7 @@ async combineAlert(data) {
                 properties: {
                     summary: {
                         type: "string",
-                        description: `Create a notification summary based on user posture and actual date/time. make sure it doesn't exceed 60 words
+                        description: `Create a notification summary based on user posture and actual date/timeu8. make sure it doesn't exceed 60 words
                         
                         `,
                     },
