@@ -21,14 +21,17 @@ class MessageService {
         const newMessage = new Message({
             message_id,
             user_id,
-            message
+            message,
+            responder: "user"
         });
+
         const linked_message_id = message_id;
         const reply = await this.reply(user_id, message);
         const newMessageReply = new Message({
             message_id,
             user_id,
             linked_message_id,
+            responder: "ai",
             message: reply
         });
 
@@ -49,7 +52,7 @@ class MessageService {
     }
 
     async getMessages( user_id ) {
-        const messages = await Message.find({ user_id }).limit(50).sort({ date: -1 });
+        const messages = await Message.find({ user_id }).limit(50);
         return messages;
     }
 

@@ -5,7 +5,7 @@ const uuid = require("uuid");
 
 const MagicFixMessage = new Schema(
   {
-    messaage_id:{
+    message_id:{
         type:String,
         required: true
     },
