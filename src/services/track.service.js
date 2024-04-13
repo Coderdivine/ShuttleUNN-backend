@@ -75,12 +75,24 @@ class Track {
   }
 
   async createPostureName(json, width, height) {
-    // const json = JSON.parse(json);
+    const checkAndParseJSON = (json) => {
+      if (typeof json === 'string') {
+          try {
+              return JSON.parse(json);
+          } catch (error) {
+              throw new CustomError("error", 400);
+          }
+      } else {
+          return json;
+      }
+    }
+    
+    const validatedJson = checkAndParseJSON(json);
     const postureName = new Pose({});
     const {
       posture_name,
       new_json
-    } = await postureName.finalPosture(json || json, width, height) || "Sitting poorly";
+    } = await postureName.finalPosture(validatedJson, width, height) || "Sitting poorly";
 
     console.log({ posture_name });
     return {
