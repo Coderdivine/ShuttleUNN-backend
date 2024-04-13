@@ -187,6 +187,8 @@ class PostureService {
       {
         posture_name: 1,
         posture_accuracy: 1,
+        posture_json:1,
+        posture_array:1,
         _id: 0,
       }
     )
