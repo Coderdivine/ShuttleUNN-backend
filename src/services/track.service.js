@@ -80,6 +80,7 @@ class Track {
   changeCSVtoJSON(posture_json) {
      if(typeof posture_json !== "string") throw new CustomError("Invalid CSV parsed.", 400);
      const objects = posture_json.split(";");
+     // firmware usecase: void trackPostureCSV(String stringCSV)
      const jsonOuput = objects?.map(obj =>{
         const params = obj.split(",");
         const label = params[0] || "";
