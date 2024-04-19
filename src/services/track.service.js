@@ -37,9 +37,12 @@ class Track {
       trackInterval,
       deviceType,
     } = data;
-
+    let useJSON = posture_json;
     const user = await User.findOne({ user_id });
     if (!user) throw new CustomError("User not located.", 400);
+    if(format == "csv"){
+      useJSON = this.changeCSVtoJSON(useJSON);
+    }
 
     const newPosture = await new Posture({
       posture_id,
@@ -48,13 +51,13 @@ class Track {
       posture_name:
         posture_name ||
         (
-          await this.createPostureName(posture_json, width, height)
+          await this.createPostureName(useJSON, width, height)
         ).posture_name,
       posture_accuracy,
       posture_rate,
       camera_resolution,
       deviceX,
-      posture_json: JSON.stringify(posture_json),
+      posture_json: JSON.stringify(useJSON),
       format,
       deviceY,
       normalizedX,
@@ -72,6 +75,22 @@ class Track {
       newPosture,
       weeklyResponse,
     };
+  }
+
+  changeCSVtoJSON(posture_json) {
+     if(typeof posture_json !== "string") throw new CustomError("Invalid CSV parsed.", 400);
+     const objects = posture_json.split(";");
+     const jsonOuput = objects?.map(obj =>{
+        const params = obj.split(",");
+        const label = params[0] || "";
+        const value = Number(params[1]) || 0;
+        const x = Number(params[2]) || 0;
+        const y = Number(params[3]) || 0;
+        const height = Number(params[4]) || 0;
+        const width = Number(params[5]) || 0;
+        return { label, value, x, y, height, width };
+     });
+     return jsonOuput;
   }
 
   async createPostureName(json, width, height) {

@@ -87,7 +87,7 @@ const Posture = new Schema(
     },
     format: {
       type: String,
-      enum: [ "text", "json" ],
+      enum: [ "text", "json", "csv" ],
       default: "text"
     }
   },
