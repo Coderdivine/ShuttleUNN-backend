@@ -163,6 +163,10 @@ const UserSchema = new Schema(
     enableMagicFix:{
       type: Boolean,
       default: false
+    },
+    onStart:{
+       type:Date,
+       default: Date.now()
     }
   },
   {

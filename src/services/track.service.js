@@ -112,7 +112,7 @@ class Track {
     const {
       posture_name,
       new_json
-    } = await postureName.finalPosture(validatedJson, width, height) || "Sitting poorly";
+    } = await postureName.finalPosture(validatedJson, Number(width), Number(height)) || "Sitting poorly";
 
     console.log({ posture_name });
     return {

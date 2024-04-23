@@ -130,6 +130,11 @@ class DeviceService {
 
   async onStart(devsensor_id) {
     const user = await User.findOne({ devsensor_id });
+    // const on_start = user?.onStart;
+    // const currentTime = Date.now();
+    // const lastSentTime = new Date(on_start).getTime();
+    // const timeDifference = currentTime - lastSentTime;
+
     if (!user) throw new CustomError("Can trace user to device_id", 400);
     const devices = user?.fcm_token;
     const sendNotificationPromises = [];

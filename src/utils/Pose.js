@@ -1,7 +1,6 @@
 const CustomError = require("./custom-error");
 
 class PoseCalculator {
-  
   constructor(keypoints) {
     this.keypoints = keypoints;
     return this;
@@ -69,11 +68,36 @@ class PoseCalculator {
   }
 
   calculateCenter(bb) {
+    console.log({
+      center: "CENTER",
+      x: bb.x + bb.width / 2,
+      y: bb.y + bb.height / 2,
+    });
     return { x: bb.x + bb.width / 2, y: bb.y + bb.height / 2 };
   }
 
   calculateAngle(p1, p2) {
-    return (Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180.0) / Math.PI;
+    const vectorX = p2.x - p1.x;
+    const vectorY = p2.y - p1.y;
+
+    // Calculate dot product of the vectors
+    const dotProduct = vectorX * vectorX + vectorY * vectorY;
+
+    // Calculate magnitudes of the vectors
+    const magnitude1 = Math.sqrt(p1.x * p1.x + p1.y * p1.y);
+    const magnitude2 = Math.sqrt(p2.x * p2.x + p2.y * p2.y);
+
+    // Calculate cosine of the angle between the vectors
+    const cosAngle = dotProduct / (magnitude1 * magnitude2);
+
+    // Calculate angle in radians
+    const angleRadians = Math.acos(cosAngle);
+
+    // Convert angle to degrees
+    const angleDegrees = angleRadians * (180 / Math.PI);
+
+    return angleDegrees;
+    // return (Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180.0) / Math.PI;
   }
 
   async finalPosture(posture_json, width, height) {
@@ -104,7 +128,7 @@ class PoseCalculator {
       waistAngle: getAngle("neck", "waist"),
     };
 
-    console.log({ angles })
+    console.log({ angles });
 
     const formatAngle = (angle) => (angle ? `${angle} degrees` : "No detected");
 
@@ -119,8 +143,6 @@ class PoseCalculator {
     waistAngle => ${formatAngle(angles.waistAngle)},
     `;
 
-
-
     return {
       new_json: postures_keypoints,
       posture_name,
@@ -128,9 +150,6 @@ class PoseCalculator {
   }
 }
 
-
-
 const poseCalculator = new PoseCalculator({});
-
 
 module.exports = PoseCalculator;
