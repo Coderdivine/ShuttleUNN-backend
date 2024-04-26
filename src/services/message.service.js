@@ -45,6 +45,7 @@ class MessageService {
     }
 
     async reply(user_id, message) {
+
         const recentPosture = await this.recentPosture(user_id);
         const recentWorkoutGiven = await this.recentWorkoutGiven(user_id);
         const { message: reply } = await useMessageAI.generateMessage({ message, recentPosture, recentWorkoutGiven });
@@ -57,7 +58,7 @@ class MessageService {
     }
 
     async recentPosture(user_id) {
-        const postures = await Posture.find({ user_id }).limit(20).sort({ date: -1 })
+        const postures = await Posture.find({ user_id }).limit(18).sort({ date: -1 })
         return "User had" + await postures.map(
             (p) =>
               `-> body posture: ${p?.posture_name} on ${p.date}. ;`
@@ -66,7 +67,7 @@ class MessageService {
     }
 
     async recentWorkoutGiven(user_id) {
-        const workouts = await ExceriseModel.find({ user_id }).limit(20).sort({ date: -1 })
+        const workouts = await ExceriseModel.find({ user_id }).limit(8).sort({ date: -1 })
         return "User was given to following workout to do,(Not all workout was done):" + await workouts.map(
             (p) =>
               `title: ${p?.title}, description: ${p?.description} on ${p.date}. ;`

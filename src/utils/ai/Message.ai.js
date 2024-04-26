@@ -15,20 +15,20 @@ class MessageAI {
       data;
     const current_date = Date.now();
     const createMessage = `${message}. Please note user recent postures: ${recentPosture}, and also ${recentWorkoutGiven} and today is ${current_date}`;
-
+    console.log({ createMessage })
     const messages = [
         { role: "assistant", content:" Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle"},
         { role: "user", content: createMessage }];
-    const functions = [
+      const functions = [
       {
         name: "create_message",
-        description: `Please create a workout based on this user's recent postures:`,
+        description: ` Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle`,
         parameters: {
           type: "object",
           properties: {
             message: {
               type: "string",
-              description: `Create the workout name. make sure it doesn't excceds 60 words.`,
+              description: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle, make the chat easy to understand, easy to implement.`,
             }
           },
           required: [
@@ -46,36 +46,40 @@ class MessageAI {
     });
 
     const responseMessage = response.choices[0].message;
+    // if (responseMessage.function_call) {
+    //   const availableFunctions = {
+    //     create_message: this.createMessage,
+    //   };
 
-    if (responseMessage.function_call) {
-      const availableFunctions = {
-        create_message: this.createMessage,
-      };
+    //   const functionName = responseMessage.function_call.name;
+    //   const functionToCall = availableFunctions[functionName];
+    //   const functionArgs = responseMessage.function_call.arguments;
+    //   let parsedArgs;
+    //     try {
+    //         parsedArgs = JSON.parse(functionArgs);
+    //     } catch (error) {
+    //         console.error('Error parsing JSON arguments:', error.message);
+    //         throw new CustomError("Unable to parse JSON arguments.", 400);
+    //   }
 
-      const functionName = responseMessage.function_call.name;
-      const functionToCall = availableFunctions[functionName];
-      const functionArgs = responseMessage.function_call.arguments;
-      let parsedArgs;
-        try {
-            parsedArgs = JSON.parse(functionArgs);
-        } catch (error) {
-            console.error('Error parsing JSON arguments:', error.message);
-            throw new CustomError("Unable to parse JSON arguments.", 400);
-      }
+    //   const functionResponse = functionToCall(
+    //     parsedArgs.message
+    //   );
 
-      const functionResponse = functionToCall(
-        parsedArgs.message
-      );
+    //   messages.push(responseMessage);
+    //   messages.push({
+    //     role: "function",
+    //     name: functionName,
+    //     content: functionResponse,
+    //   });
+    //   const returnedMessage = response.choices[0].message?.content;
+    //   console.log({ returnedMessage })
+    //   return parsedArgs;
+    // }
 
-      messages.push(responseMessage);
-      messages.push({
-        role: "function",
-        name: functionName,
-        content: functionResponse,
-      });
-
-      return parsedArgs;
-    }
+    const returnedMessage = response.choices[0].message?.content;
+    console.log({ returnedMessage })
+    return { message: returnedMessage };
   }
   
   createMessage(

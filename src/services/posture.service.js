@@ -234,6 +234,7 @@ class PostureService {
             $group: {
               _id: "$posture_name",
               count: { $sum: 1 },
+              posture_json: { $addToSet: "$posture_json" }
             },
           },
           {

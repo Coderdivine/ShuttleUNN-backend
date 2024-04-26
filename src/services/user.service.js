@@ -151,6 +151,9 @@ class UserService {
     if (data.password) {
       const hash = await bcrypt.hash(data.password, 10);
       data.password = hash;
+      const isUsername = await User.findOne({ username: data?.username });
+      if(isUsername && isUsername?.user_id !== user_id ) throw new CustomError("Username taken", 400);
+
       const user = await User.updateOne({ user_id }, { $set: data });
       console.log({ user });
 
