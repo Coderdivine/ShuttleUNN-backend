@@ -17,6 +17,10 @@ const MagicFixMessage = new Schema(
         type:String,
         required: true
     },
+    prompt:{
+      type: String,
+      default: null
+    },
     responder:{
         type:String,
         required: true,

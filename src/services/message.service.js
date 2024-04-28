@@ -18,21 +18,23 @@ class MessageService {
         const user = await User.findOne({ user_id });
         if(!user) throw new CustomError("User not found", 400);
         const message_id = uuid.v4();
-        const newMessage = new Message({
-            message_id,
-            user_id,
-            message,
-            responder: "user"
-        });
 
         const linked_message_id = message_id;
-        const reply = await this.reply(user_id, message);
+        const { reply, createMessage } = await this.reply(user_id, message);
         const newMessageReply = new Message({
             message_id,
             user_id,
             linked_message_id,
             responder: "ai",
             message: reply
+        });
+
+        const newMessage = new Message({
+            message_id,
+            user_id,
+            message: message,
+            prompt: createMessage,
+            responder: "user"
         });
 
         const messageSent = await newMessage.save();
@@ -45,20 +47,44 @@ class MessageService {
     }
 
     async reply(user_id, message) {
-
         const recentPosture = await this.recentPosture(user_id);
         const recentWorkoutGiven = await this.recentWorkoutGiven(user_id);
-        const { message: reply } = await useMessageAI.generateMessage({ message, recentPosture, recentWorkoutGiven });
-        return reply;
+        const recentMessages = await this.getrecentMessages(user_id);
+        const useProfile = await this.useProfile(user_id);
+        const { message: reply, createMessage } = await useMessageAI.generateMessage({ message, recentPosture, recentWorkoutGiven, recentMessages, useProfile });
+        return { reply, createMessage };
     }
 
+    async useProfile(user_id) {
+    const user = await User.findOne({ user_id });
+    const profile = user?.useProfileForWorkout;
+    if (user && profile) {
+      const returnedText = `
+      Consider this information as a reference: the user's age is ${user?.age}, 
+      identified as ${user?.gender}, engaged in ${user?.occupation}
+      with a weight of ${user?.weight} and a height of ${user?.height}.
+      hobby: ${user?.hobby}.
+      `;
+      console.log({ Profile: returnedText });
+      return returnedText;
+    } else {
+      return "";
+    }
+  }
+
     async getMessages( user_id ) {
-        const messages = await Message.find({ user_id }).limit(50);
+        const messages = await Message.find({ user_id }).limit(40);
         return messages;
     }
 
+    async getrecentMessages( user_id ) {
+        let messages = await Message.find({ user_id }).limit(12);
+        messages = await messages?.map(msg => { return { role: msg.responder == "user" ? "user" : "assistant", content: msg?.prompt || msg?.message  } });
+        return messages || [] ;
+    }
+
     async recentPosture(user_id) {
-        const postures = await Posture.find({ user_id }).limit(18).sort({ date: -1 })
+        const postures = await Posture.find({ user_id }).limit(10).sort({ date: -1 })
         return "User had" + await postures.map(
             (p) =>
               `-> body posture: ${p?.posture_name} on ${p.date}. ;`
@@ -67,8 +93,8 @@ class MessageService {
     }
 
     async recentWorkoutGiven(user_id) {
-        const workouts = await ExceriseModel.find({ user_id }).limit(8).sort({ date: -1 })
-        return "User was given to following workout to do,(Not all workout was done):" + await workouts.map(
+        const workouts = await ExceriseModel.find({ user_id }).limit(7).sort({ date: -1 })
+        return "" + await workouts.map(
             (p) =>
               `title: ${p?.title}, description: ${p?.description} on ${p.date}. ;`
           )
