@@ -21,13 +21,7 @@ class MessageService {
 
         const linked_message_id = message_id;
         const { reply, createMessage } = await this.reply(user_id, message);
-        const newMessageReply = new Message({
-            message_id,
-            user_id,
-            linked_message_id,
-            responder: "ai",
-            message: reply
-        });
+        console.log({ reply })
 
         const newMessage = new Message({
             message_id,
@@ -35,6 +29,14 @@ class MessageService {
             message: message,
             prompt: createMessage,
             responder: "user"
+        });
+
+        const newMessageReply = new Message({
+            message_id,
+            user_id,
+            linked_message_id,
+            responder: "ai",
+            message: reply
         });
 
         const messageSent = await newMessage.save();
@@ -73,7 +75,10 @@ class MessageService {
   }
 
     async getMessages( user_id ) {
-        const messages = await Message.find({ user_id }).limit(40);
+        let messages = await Message.find({ user_id })
+        .sort({ $natural: -1 })
+        .limit(50);
+        messages = messages?.reverse();
         return messages;
     }
 
