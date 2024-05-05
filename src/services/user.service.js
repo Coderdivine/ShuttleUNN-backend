@@ -347,6 +347,8 @@ class UserService {
     if(!user) throw new CustomError("User not found", 400);
     return user?.enableMagicFix;
   }
+
+
 }
 
 module.exports = new UserService();

@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const auth = require("../middlewares/auth.middleware")();
+router.use(require("./../middlewares/trim-incoming-requests.middleware"))
 const DeviceCtrl = require("../controllers/device.controller");
 
 router.get("/device-details/:devsensor_id", DeviceCtrl.getDeviceDetails);

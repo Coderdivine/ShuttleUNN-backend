@@ -119,6 +119,7 @@ class DeviceService {
     if (!user) throw new CustomError("Device not activated.", 400);
     user.isLinked = true;
     await user.save();
+    console.log({ message: "Device Enabled" })
     return { message: "Device Enabled" };
   }
 
@@ -134,7 +135,9 @@ class DeviceService {
     // const currentTime = Date.now();
     // const lastSentTime = new Date(on_start).getTime();
     // const timeDifference = currentTime - lastSentTime;
-
+    if(!user?.isLinked){
+        await this.enableDevice({ devsensor_id });
+    }
     if (!user) throw new CustomError("Can trace user to device_id", 400);
     const devices = user?.fcm_token;
     const sendNotificationPromises = [];

@@ -55,7 +55,7 @@ class PostureService {
   async postureSummary(user_id) {
     const message = await Notification.findOne({ user_id, type: "combined" }).sort({ date: -1 });
     console.log({ message });
-    return message;
+    return message ? message : "No posture summary";
   }
 
   async generatePrompt(postures) {

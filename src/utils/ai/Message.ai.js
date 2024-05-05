@@ -5,7 +5,7 @@ const openai = new open_ai({
   apiKey,
 });
 const CustomError = require("../custom-error");
-
+const { AffectedBodyParts } = require("../../config");
 
 
 class MessageAI {
@@ -16,9 +16,9 @@ class MessageAI {
     const current_date = Date.now();
     const createMessage = `message => ${message}. to answer, please note: user recent postures: ${recentPosture}, and also User was given to following workout to do, (Not all workout was done): ${recentWorkoutGiven} and today is ${current_date}`;
     const messages = [
-        { role: "assistant", content: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle. feel free to answer any other questions concerning the user: hobby, posture, body building, sitting time and all. here are things you need to know about user: ${useProfile}`},
+        { role: "assistant", content: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle. feel free to answer any other questions concerning the user: hobby, posture, body building, sitting time and all. here are things you need to know about user: ${useProfile} ${useProfile}. Also please be a posture and productive assitant and explain user's part of the body for exmaple: ${this.affectedPartsInText()}. Also help the user answer any health question concerning human body`},
         ...recentMessages,
-        { role: "user", content: createMessage + "Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle. feel free to answer any other questions concerning the user: hobby, posture, body building, sitting time and all." + "here are things you need to know about user:" + useProfile }
+        { role: "user", content: createMessage + "Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle. feel free to answer any other questions concerning the user: hobby, posture, body building, sitting time and all." + "here are things you need to know about user:" + useProfile + ". Also please be a posture and productive assitant and explain user's part of the body for exmaple:" + this.affectedPartsInText() + ". Also help the user answer any health question concerning human body" }
     ];
     const functions = [
       {
@@ -79,6 +79,10 @@ class MessageAI {
 
        return { ...parsedArgs, createMessage };
     }
+  }
+  
+  affectedPartsInText(){
+    return AffectedBodyParts.map(ap => `${ap},`).join("")
   }
   
   createMessage(
