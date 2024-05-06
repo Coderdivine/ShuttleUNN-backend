@@ -69,7 +69,7 @@ class UserService {
     const email = data.email;
     const user_data = await User.findOne({ email });
     console.log({ user_data });
-    if (!user_data) throw new CustomError("No user found", 404);
+    if (!user_data) throw new CustomError("Wrong email address", 404);
     const decoded_hash = await bcrypt.compare(
       data.password,
       user_data.password
