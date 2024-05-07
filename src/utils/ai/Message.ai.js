@@ -16,9 +16,9 @@ class MessageAI {
     const current_date = Date.now();
     const createMessage = `message => ${message}. to answer, please note: user recent postures: ${recentPosture}, and also User was given to following workout to do, (Not all workout was done): ${recentWorkoutGiven} and today is ${current_date}`;
     const messages = [
-        { role: "assistant", content: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle. feel free to answer any other questions concerning the user: hobby, posture, body building, sitting time and all. here are things you need to know about user: ${useProfile} ${useProfile}. Also please be a posture and productive assitant and explain user's part of the body for exmaple: ${this.affectedPartsInText()}. Also help the user answer any health question concerning human body`},
+        { role: "assistant", content: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle. feel free to answer any other questions concerning the user: hobby, posture, body building, sitting time and all. here are things you need to know about user: ${useProfile} ${useProfile}. Also please be a posture and productive assitant and explain user's part of the body for exmaple: ${this.affectedPartsInText()}. Also help the user answer any health question with or without a '?' concerning human body`},
         ...recentMessages,
-        { role: "user", content: createMessage + "Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle. feel free to answer any other questions concerning the user: hobby, posture, body building, sitting time and all." + "here are things you need to know about user:" + useProfile + ". Also please be a posture and productive assitant and explain user's part of the body for exmaple:" + this.affectedPartsInText() + ". Also help the user answer any health question concerning human body" }
+        { role: "user", content: createMessage + "Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle. feel free to answer any other questions concerning the user: hobby, posture, body building, sitting time and all." + "here are things you need to know about user:" + useProfile + ". Also please be a posture and productive assitant and explain user's part of the body for exmaple:" + this.affectedPartsInText() + ". Also help the user answer any health question with or without a '?' concerning human body" }
     ];
     const functions = [
       {
@@ -29,7 +29,7 @@ class MessageAI {
           properties: {
             message: {
               type: "string",
-              description: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle, make the chat easy to understand, easy to implement, make it simple to read even anyone can understand`,
+              description: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle, make the chat easy to understand, easy to implement, make it simple and straight forward to read so that anyone can understand`,
             }
           },
           required: [
