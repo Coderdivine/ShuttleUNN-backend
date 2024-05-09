@@ -730,7 +730,7 @@ class Track {
         (p) =>
           `-> had body posture: ${p.posture_name}  on ${p.date}. ;`
       )
-      .join("");
+      .join("") || "";
       //at ${p.posture_accuracy}% accuracy
   }
 
