@@ -329,7 +329,7 @@ class Track {
 
   getRandomNumberToAvg(avg) {
     return avg > 0 && Number.isInteger(avg)
-      ? Math.floor(Math.random() * (avg / 2)) + avg / 2 + 1
+      ? Math.floor(Math.random() * (avg / 0.5)) + avg / 0.5 + 1
       : null;
   }
 
@@ -740,7 +740,7 @@ class Track {
         (p) =>
           `-> had previously done the following workout: ${p.title}, description =>  ${p.description}, on ${p.date}. ;`
       )
-      .join("");
+      .join("") || "";
   }
 
   async getLastWorkoutDetails(user_id) {

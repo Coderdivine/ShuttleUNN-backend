@@ -1,3 +1,3 @@
 # DevSensorBackend
 
-### Maintain good and health posture that's all.
+### Maintain good and healthy posture that's all.
