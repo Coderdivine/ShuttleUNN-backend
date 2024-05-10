@@ -94,7 +94,7 @@ class MessageService {
             (p) =>
               `-> body posture: ${p?.posture_name} on ${p.date}. ;`
           )
-          .join("");
+          .join("") || "";
     }
 
     async recentWorkoutGiven(user_id) {
@@ -103,7 +103,7 @@ class MessageService {
             (p) =>
               `title: ${p?.title}, description: ${p?.description} on ${p.date}. ;`
           )
-          .join("");
+          .join("") || "No Workout given yet";
     }
 }
 

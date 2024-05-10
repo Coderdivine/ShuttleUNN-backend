@@ -211,6 +211,7 @@ class Track {
 
           // Convert Mongoose document to plain JavaScript object
           const plainObject = posture.toObject();
+          console.log({ plainObject })
 
           return { ...plainObject, isAboveAverage };
         }
@@ -684,7 +685,7 @@ class Track {
           afftected_id: uuid.v4(),
           area: areas,
           user_id,
-          posture: recentPostureIntext,
+          posture: recentPostureIntext || "No posture yet",
           percentage: 0,
         }).save();
 
@@ -725,12 +726,11 @@ class Track {
   }
 
   async recentPostureIntext(posture) {
-    return posture
-      .map(
+    return posture?.map(
         (p) =>
           `-> had body posture: ${p.posture_name}  on ${p.date}. ;`
       )
-      .join("") || "";
+      .join("") || "No posture yet";
       //at ${p.posture_accuracy}% accuracy
   }
 
