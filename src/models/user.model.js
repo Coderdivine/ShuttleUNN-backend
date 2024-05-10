@@ -124,11 +124,11 @@ const UserSchema = new Schema(
     },
     alertInterval: {
       type: Number,
-      default: 1700,
+      default: 2700,
     },
     workoutAlert: {
       type: Number,
-      default: 1800,
+      default: 2800,
     },
     fcm_token: {
       type: [
