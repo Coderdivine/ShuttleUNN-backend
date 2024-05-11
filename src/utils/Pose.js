@@ -68,11 +68,6 @@ class PoseCalculator {
   }
 
   calculateCenter(bb) {
-    console.log({
-      center: "CENTER",
-      x: bb.x + bb.width / 2,
-      y: bb.y + bb.height / 2,
-    });
     return { x: bb.x + bb.width / 2, y: bb.y + bb.height / 2 };
   }
 

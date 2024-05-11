@@ -276,7 +276,6 @@ class Track {
     const getLastNotificationOfType = (type) => {
       const notificationOfType = notifications.find((n) => n?.type === type);
       const result = notificationOfType ? notificationOfType.date : Date.now();
-      console.log({ ResultForNotificationOfType: result , VScurentDate: Date.now() });
       return result;
     };
 
