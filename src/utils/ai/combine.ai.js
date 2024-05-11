@@ -31,17 +31,33 @@ async combineAlert(data) {
                 properties: {
                     summary: {
                         type: "string",
-                        description: `Create a notification summary based on user posture and actual date/timeu8. make sure it doesn't exceed 60 words
-                        
+                        description: `Create a notification summary based on user posture and actual date/time. make sure it doesn't exceed 60 words,
+                        e.g 
+                        1. Time for a workout,
+                        2. Time for a simple workout,
+                        3. Try this <duration e.g. 2 minutes>
+                        4. Recent posture workout to do
                         `,
                     },
                     notification_notification_text: {
                         type: "string",
-                        description: `Create the notification summary title. make sure the sentence doesn't exceed 50 words,  for example: 1. time for a simple workout to keep you going, 2. This workout will keep you going 3. perform this 3mins workout. Just come up with something similar to these examples, making sure it's based on the given posture and date/time`,
+                        description: `Create the notification summary title. make sure the sentence doesn't exceed 50 words,  for example: 
+                        1. time for a simple workout to keep you going, 
+                        2. This workout will keep you going 
+                        3. perform this 3mins workout. 
+                        4. Time for a workout,
+                        5. Time for a simple workout,
+                        6. Try this <duration e.g. 2 minutes>
+                        7. Recent posture workout to do
+                        Just come up with something similar to these examples, making sure it's based on the given posture and date/time`,
                     },
                     notification_description: {
                         type: "string",
-                        description: `Create notification summary description. give some exercise to do and make it detailed workout.`,
+                        description: `
+                        Create notification summary description. give some exercise to do and make it detailed workout.
+                        e.g
+                        We've created exercises that will help you for the <date e.g., day, weekend>. here's is it: <give exercises based on posture>
+                        `,
                     },
                     importance: {
                         type: "string",

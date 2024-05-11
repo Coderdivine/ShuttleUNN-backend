@@ -114,7 +114,6 @@ class Track {
       new_json
     } = await postureName.finalPosture(validatedJson, Number(width), Number(height)) || "Sitting poorly";
 
-    console.log({ posture_name });
     return {
       posture_name,
       new_json
@@ -160,7 +159,7 @@ class Track {
       user.alertInterval,
     ]);
     const limit = Math.round(intervalAvg / user?.track_frequency);
-    console.log({ intervalAvg, limit });
+    // console.log({ intervalAvg, limit });
 
     const posture = await Posture.find({ user_id })
       .sort({ date: -1 })
@@ -211,8 +210,6 @@ class Track {
 
           // Convert Mongoose document to plain JavaScript object
           const plainObject = posture.toObject();
-          console.log({ plainObject })
-
           return { ...plainObject, isAboveAverage };
         }
       })
@@ -331,8 +328,9 @@ class Track {
   }
 
   getRandomNumberToAvg(avg) {
+    const threshold = 0.13;
     return avg > 0 && Number.isInteger(avg)
-      ? Math.floor(Math.random() * (avg / 0.5)) + avg / 0.5 + 1
+      ? Math.floor(Math.random() * (avg / threshold)) + avg / threshold 
       : null;
   }
 
@@ -383,7 +381,6 @@ class Track {
       lastSittingTime,
       period,
     } = data;
-    console.log({ data });
 
     // Check if the period in seconds is greater than 24hrs in seconds
     const useTimer = period < 24 * 60 * 60;
@@ -391,22 +388,23 @@ class Track {
     // const Countdowns = if initalCountdowns? create a function to map the values(Numbers) in descending order: else create a function to map the values(date) in descending order
     const initalCountdownsAvg = this.calculateAverage(initalCountdowns);
     const newInitalCountdowns = initalCountdowns.map(
-      (x) => x + this.getRandomNumberToAvg(initalCountdownsAvg)
+      (x) => Math.floor(x) // + this.getRandomNumberToAvg(initalCountdownsAvg)
     );
 
     const newdynamicCountdowns = dynamicCountdowns.map((timestamp, index) => {
       const randomMilliseconds =
         this.getRandomNumberToAvg(newInitalCountdowns[index]) * 1000;
-      console.log({ randomMilliseconds, timestamp });
-      return new Date(timestamp).getTime() + randomMilliseconds;
+      console.log({ timestamp: moment(timestamp).format("YYYY-MM-DD hh:mm:ss.SSS A") });
+      return new Date(timestamp).getTime() // + randomMilliseconds;
     });
 
     console.log({
       newdynamicCountdowns: newdynamicCountdowns.map((x) =>
         moment(x).format("YYYY-MM-DD hh:mm:ss.SSS A")
       ),
-      newInitalCountdowns,
+      newInitalCountdowns
     });
+
     const Countdowns = useTimer ? newInitalCountdowns : newdynamicCountdowns;
 
     const timeUnit = useTimer ? "sec" : "millseconds";
@@ -418,27 +416,56 @@ class Track {
       ? this.calculateAverage(Countdowns)
       : this.calculateAverageDate(Countdowns);
     const lastSittingTimenewDate = new Date(lastSittingTime).getTime();
+    const currentDate = Date.now();
+    const duration = this.calculateAverage(newInitalCountdowns);
+
     console.log({
-      avg: useTimer ? avg : moment(avg).format("YYYY-MM-DD hh:mm:ss.SSS A"),
-      lastSittingTimenewDate,
+      currentDate: moment(currentDate).format("YYYY-MM-DD hh:mm:ss.SSS A"),
+      CountDownAvg: useTimer ? avg : moment(avg).format("YYYY-MM-DD hh:mm:ss.SSS A"),
+      lastSittingTimenewDate: moment(lastSittingTimenewDate).format("YYYY-MM-DD hh:mm:ss.SSS A"),
+      duration
     });
+
+    const currentDateMoment = moment(currentDate);
+    const CountDownAvgMoment = useTimer ? moment(avg) : moment(avg);
+    const lastSittingTimenewDateMoment = moment(lastSittingTimenewDate);
+    const diffInSeconds = currentDateMoment.diff(CountDownAvgMoment, 'seconds');
+
     console.log({
-      currentDate: moment(Date.now()).format("YYYY-MM-DD hh:mm:ss.SSS A"),
-    });
+      currentDateMoment,
+      CountDownAvgMoment,
+      lastSittingTimenewDateMoment,
+      diffInSeconds
+    })
+
+
+    if (diffInSeconds > duration) {
+        console.log("The time between currentDate and CountDownAvg is greater than the specified duration.");
+    } else {
+        console.log("The time between currentDate and CountDownAvg is not greater than the specified duration.");
+    }
 
     // if useTimer is true and ((lastSittingTime from date to sec) < avg ) else (Date.now() < avg) = true;
     const firstCondition = Math.round(
       Date.now() / 1000 - lastSittingTimenewDate / 1000
     );
 
-    console.log({ firstCondition });
-    console.log({ currentDate: Date.now() });
-    console.log({ remaining: (Date.now() - avg) / 1000 });
+
+
+
+
+
     const isTimeToPush = useTimer
       ? this.checkTime(firstCondition > avg ? true : false)
-      : this.checkTime(Date.now() < avg ? false : true);
+      : diffInSeconds > duration;
 
+    console.log("Checking time to push message :::>")
     console.log({ isTimeToPush });
+
+
+
+
+
 
     if (isTimeToPush) {
       // create a function called checkBoolean to check this
@@ -581,7 +608,6 @@ class Track {
       with a weight of ${user?.weight} and a height of ${user?.height}.
       hobby: ${user?.hobby}.
       `;
-      console.log({ Profile: returnedText });
       return returnedText;
     } else {
       return "";
@@ -598,7 +624,6 @@ class Track {
     if (!msgLength || msgLength > 3) return false;
 
     const notifications = [];
-
     const generateNotification = async (i) => {
       let generatedContent, notificationType;
       console.log({ i });
@@ -706,6 +731,7 @@ class Track {
             warning_description ||
             alert_description,
           type: notificationType,
+          sent: false,
           nextNotification: new Date(nextNotificationDate),
           date: new Date(Date.now()),
         });
@@ -772,35 +798,44 @@ class Track {
       ],
     })
       .sort({ date: -1 })
-      .limit(3);
+      .limit(2) || null;
+    console.log({ messageToSend });
 
     let messageCount = 0;
     const sendNotificationsPromises = [];
 
-    for (const message of messageToSend || []) {
-      const pushMessagePromise = await this.sendNotifications({
-        user_id,
-        title: message.title,
-        description: message.description,
-        link: message.link,
+    if(messageToSend){
+      for (const message of messageToSend || []) {
+        const pushMessagePromise = await this.sendNotifications({
+          user_id,
+          title: message.title,
+          description: message.description,
+          link: message.link,
+        });
+  
+        const messageNotification = await Notifications.findOne({
+          notification_id: message.notification_id,
+        });
+        messageNotification.sent = true;
+        const saved = await messageNotification.save();
+        const saveAllAsSent = await Notifications.updateMany(
+          { user_id },
+          { $set: { sent: true } }
+        );
+        sendNotificationsPromises.push(pushMessagePromise);
+        messageCount++;
+      }
+  
+      const pushMessages = await Promise.all(sendNotificationsPromises);
+  
+      pushMessages.forEach((pushMessage) => {
+        messageCount++;
       });
-
-      const messageNotification = await Notifications.findOne({
-        notification_id: message.notification_id,
-      });
-      messageNotification.sent = true;
-      const saved = await messageNotification.save();
-      sendNotificationsPromises.push(pushMessagePromise);
-      messageCount++;
     }
 
-    const pushMessages = await Promise.all(sendNotificationsPromises);
+    console.log({ messageCount, reason: "releaseMessage" });
 
-    pushMessages.forEach((pushMessage) => {
-      messageCount++;
-    });
-
-    return { messageCount, reason: "inMessage" };
+    return { messageCount, reason: "releaseMessage" };
   }
 
   async lastBodyPartAffected(user_id) {
@@ -811,7 +846,6 @@ class Track {
     ]);
 
     const limit = Math.round(intervalAvg / user?.track_frequency);
-    console.log({ intervalAvg, limit });
 
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -822,7 +856,7 @@ class Track {
     })
       .sort({ date: -1 })
       .limit(limit);
-    console.log({ affected: await affected.map((x) => x.area) });
+    // console.log({ affected: await affected.map((x) => x.area) });
     return affected;
   };
   

@@ -128,7 +128,6 @@ class PoseCalculator {
       waistAngle: getAngle("neck", "waist"),
     };
 
-    console.log({ angles });
 
     const formatAngle = (angle) => (angle ? `${angle} degrees` : "No detected");
 
