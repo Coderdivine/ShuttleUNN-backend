@@ -14,7 +14,7 @@ async combineAlert(data) {
     const { postures, profile } = data;
     const current_date = Date.now();
     const createMessage = `
-    Be a posture instructor. based on user's postures, create a summary warning user about his/her recent posture and also recommend a suitable workout based on the user's postures.
+    Be a posture instructor. based on user's postures, create a summary warning user about his/her recent posture and also recommend a suitable exercises based on the user's postures.
     here's the user's recent postures:
     ${postures}, current date: ${current_date}.
     ${profile}
@@ -23,7 +23,7 @@ async combineAlert(data) {
     const functions = [
         {
             name: "create_workout",
-            description: `Be a posture instructor. based on user posture, create a summary warning user about thier recent posture and also recommend a suitable workout based on that posture.
+            description: `Be a posture instructor. based on user posture, create a summary warning user about thier recent posture and also recommend a suitable exercises based on that posture.
         here's the user's recent posture.
         `,
             parameters: {
@@ -33,28 +33,28 @@ async combineAlert(data) {
                         type: "string",
                         description: `Create a notification summary based on user posture and actual date/time. make sure it doesn't exceed 60 words,
                         e.g 
-                        1. Time for a workout,
-                        2. Time for a simple workout,
+                        1. Time for a exercises,
+                        2. Time for a simple exercises,
                         3. Try this <duration e.g. 2 minutes>
-                        4. Recent posture workout to do
+                        4. Recent posture exercises to do
                         `,
                     },
                     notification_notification_text: {
                         type: "string",
                         description: `Create the notification summary title. make sure the sentence doesn't exceed 50 words,  for example: 
-                        1. time for a simple workout to keep you going, 
-                        2. This workout will keep you going 
-                        3. perform this 3mins workout. 
-                        4. Time for a workout,
-                        5. Time for a simple workout,
+                        1. time for a simple exercises to keep you going, 
+                        2. This exercises will keep you going 
+                        3. perform this 3mins exercises. 
+                        4. Time for a exercises,
+                        5. Time for a simple exercises,
                         6. Try this <duration e.g. 2 minutes>
-                        7. Recent posture workout to do
+                        7. Recent posture exercises to do
                         Just come up with something similar to these examples, making sure it's based on the given posture and date/time`,
                     },
                     notification_description: {
                         type: "string",
                         description: `
-                        Create notification summary description. give some exercise to do and make it detailed workout.
+                        Create notification summary description. give some exercise to do and make it detailed exercises.
                         e.g
                         We've created exercises that will help you for the <date e.g., day, weekend>. here's is it: <give exercises based on posture>
                         `,

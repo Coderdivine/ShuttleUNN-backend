@@ -24,39 +24,39 @@ class WorkoutAI {
     const functions = [
       {
         name: "create_workout",
-        description: `Please create a workout based on this user's recent postures:`,
+        description: `Please create a exercise based on this user's recent postures:`,
         parameters: {
           type: "object",
           properties: {
             workout_name: {
               type: "string",
-              description: `Create the workout name. make sure it doesn't excceds 60 words.`,
+              description: `Create the exerciss name. make sure it doesn't excceds 60 words.`,
             },
             workout_description: {
               type: "string",
-              description: `Create workout description. Description of the workout, For example:
-              For the past 16 minutes, you've been sitting. Use 60 seconds to perform these workouts related to sitting posture: <Provide workouts for sitting posture>.
+              description: `Create exercise description. Description of the exercise, For example:
+              For the past 16 minutes, you've been sitting. Use 60 seconds to perform these exercises related to sitting posture: <Provide exercises for sitting posture>.
               For the last 30 minutes, your posture has been okay/poor.
-              Perform this 2-minute workout related to your recent postures.
-              It's been 20 minutes; take a break to perform this one-minute workout.
-              You <have/had> a <posture e.g stiff_neck> while sitting, try this <Number of workout e.g 2> workout.
-              You <have/had> a <posture e.g stiff_neck> while sitting, try this <2> workout.
-              You've been sitting for 30 minutes. Try this workout to increase productivity.
+              Perform this 2-minute exercise related to your recent postures.
+              It's been 20 minutes; take a break to perform this one-minute exercise.
+              You <have/had> a <posture e.g stiff_neck> while sitting, try this <Number of exercise e.g 2> exercise.
+              You <have/had> a <posture e.g stiff_neck> while sitting, try this <2> exercise.
+              You've been sitting for 30 minutes. Try this exercise to increase productivity.
 
 
               Just come up with something similar to these examples, making sure it's based on the given posture and date/time.`,
             },
             duration: {
               type: "string",
-              description: `Give workout duration in seconds. e.g. 20`,
+              description: `Give exercise duration in seconds. e.g. 20`,
             },
             workout_notification_text: {
               type: "string",
-              description: `Create the workout title. make sure it doesn't excceds 60 words, for example: 1. time for a simple workout to keep you going, 2. This workout will keep you going 3. perform this 3mins workout. Just come up with something similar to these examples, making sure it's based on the given posture and date/time.`,
+              description: `Create the exercise title. make sure it doesn't excceds 60 words, for example: 1. time for a simple exercises to keep you going, 2. This exercises will keep you going 3. perform this 3mins exercises. Just come up with something similar to these examples, making sure it's based on the given posture and date/time.`,
             },
             instruction: {
               type: "string",
-              description: `Write a detailed instruction on how to perform the workout`,
+              description: `Write a detailed instruction on how to perform the exercises`,
             },
             difficultyLevel: {
               type: "string",

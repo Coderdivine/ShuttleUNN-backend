@@ -277,7 +277,7 @@ class PostureAI {
     const { current, previous } = data;
     const current_date = Date.now();
     const createMessage = `
-      Be a pro human posture assistant and and workout guardian.
+      Be a pro human posture assistant and and exercises guardian.
       Give a weekly report based a user recent week postures: ${current} and previous week postures: ${previous},
       Take note of today's date: ${current_date}.
     `;

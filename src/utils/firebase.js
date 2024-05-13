@@ -9,13 +9,14 @@ admin.initializeApp({
 
 class PushMessage {
 
-    async sendMessage(message) {
+    async sendMessage({ message, user }) {
       if(!message) throw new CustomError("Please provide message to send.", 400);
       const response = await admin
       .messaging()
       .send(message);
+
+      console.log({ response });
       if(!response) throw new CustomError("Unable to send push message to user", 400);
-      console.log({ response: "MESSAGE SENT" });
       return response;
     }
 }

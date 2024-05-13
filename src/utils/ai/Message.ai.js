@@ -14,7 +14,7 @@ class MessageAI {
     const { message, recentPosture, recentWorkoutGiven, recentMessages, useProfile } =
       data;
     const current_date = Date.now();
-    const createMessage = `message => ${message}. to answer, please note: user recent postures: ${recentPosture}, and also User was given to following workout to do, (Not all workout was done): ${recentWorkoutGiven} and today is ${current_date}`;
+    const createMessage = `message => ${message}. to answer, please note: user recent postures: ${recentPosture}, and also User was given to following exercises to do, (Not all exercises was done): ${recentWorkoutGiven} and today is ${current_date}`;
     const messages = [
         { role: "assistant", content: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle. feel free to answer any other questions concerning the user: hobby, posture, body building, sitting time and all. here are things you need to know about user: ${useProfile} ${useProfile}. Also please be a posture and productive assitant and explain user's part of the body for exmaple: ${this.affectedPartsInText()}. Also help the user answer any health question with or without a '?' concerning human body`},
         ...recentMessages,
@@ -29,7 +29,7 @@ class MessageAI {
           properties: {
             message: {
               type: "string",
-              description: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle, make the chat easy to understand, easy to implement, make it simple and straight forward to read so that anyone can understand`,
+              description: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle, recommend easy exercises humans can easily implement and not out of the box, make the chat easy to understand, easy to implement, make it simple and straight forward to read so that anyone can understand`,
             }
           },
           required: [

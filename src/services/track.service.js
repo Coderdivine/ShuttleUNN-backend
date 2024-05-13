@@ -256,9 +256,7 @@ class Track {
           },
         };
 
-        const sendNotificationPromise = await PushNotification.sendMessage(
-          message
-        );
+        const sendNotificationPromise = await PushNotification.sendMessage({ message: message, user });
         sendNotificationPromises.push(sendNotificationPromise);
       }
     }
@@ -268,14 +266,14 @@ class Track {
     return responses;
   }
 
-  async lastNotificationSent(user_id) {
+  async lastNotificationSent({user_id, timestamps }) {
     const notifications = await Notifications.find({ user_id }).sort({
       date: -1,
     });
 
     const getLastNotificationOfType = (type) => {
       const notificationOfType = notifications.find((n) => n?.type === type);
-      const result = notificationOfType ? notificationOfType.date : Date.now();
+      const result = notificationOfType ? notificationOfType.date : timestamps|| Date.now();
       return result;
     };
 
@@ -337,7 +335,7 @@ class Track {
     const user = await User.findOne({ user_id });
     if (!user) throw new CustomError("User not located..", 400);
     const { workout, warning, alert, combined } =
-      await this.lastNotificationSent(user_id); // Dates
+      await this.lastNotificationSent({ user_id, timestamps: user?.timestamps }); // Dates
     const intervalToSendalert = await this.intervalToSendalert(user); // Sec
     const intervalToSendWorkout = await this.intervalToSendWorkout(user); // Sec
     const { lastSittingTime, period } = await this.lastAvgSittingTime(
@@ -359,8 +357,8 @@ class Track {
         ],
         lastSittingTime,
         period,
-        user_id,
-      });
+        user_id
+       });
 
     const sendNotification = await this.sendNotification(
       user_id,
@@ -382,7 +380,9 @@ class Track {
     } = data;
 
     // Check if the period in seconds is greater than 24hrs in seconds
-    const useTimer = period < 24 * 60 * 60;
+    // useTimer if new user? " Check Date.now() > accountCreated : Perform countdowns " ...
+
+    const useTimer = false // period < 24 * 60 * 60;
 
     // const Countdowns = if initalCountdowns? create a function to map the values(Numbers) in descending order: else create a function to map the values(date) in descending order
     const initalCountdownsAvg = this.calculateAverage(initalCountdowns);
@@ -455,7 +455,7 @@ class Track {
 
 
     const isTimeToPush = useTimer
-      ? this.checkTime(firstCondition > avg ? true : false)
+      ? diffInSeconds > duration
       : diffInSeconds > duration;
 
     console.log("Checking time to push message :::>")
