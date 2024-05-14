@@ -8,8 +8,8 @@ const config = {
         ADMIN: ["admin"]
     },
     URL: {
-        LANDING_URL: process.env.LANDING_URL || "http://localhost:3000",
-        DASHBOARD_URL: process.env.DASHBOARD_URL || "http://localhost:3000/dashboard"
+        LANDING_URL: process.env.LANDING_URL || "https://devsensor-frontend.vercel.app",
+        DASHBOARD_URL: process.env.DASHBOARD_URL || "https://devsensor-frontend.vercel.app/dashboard"
     },
     mailer: {
         HOST: process.env.MAILER_HOST || "smtp.gmail.com",

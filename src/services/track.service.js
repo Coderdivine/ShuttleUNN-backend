@@ -237,7 +237,7 @@ class Track {
     }
 
     const devices = user?.fcm_token;
-    console.log({ devices })
+    
     const sendNotificationPromises = [];
 
     for (let i = 0; i < devices?.length; i++) {

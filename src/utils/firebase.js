@@ -28,8 +28,8 @@ class PushMessage {
       });
     }
 
-    deleteById(arr, idToDelete) {
-    return arr.filter(obj => obj.token !== idToDelete);
+    deleteById(arr, tokenToDelete) {
+    return arr.filter(obj => obj.token !== tokenToDelete);
     }
 }
 
