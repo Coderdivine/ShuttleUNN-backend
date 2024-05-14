@@ -29,7 +29,7 @@ class PushMessage {
     }
 
     deleteById(arr, idToDelete) {
-    return arr.filter(obj => obj.id !== idToDelete);
+    return arr.filter(obj => obj.token !== idToDelete);
     }
 }
 
