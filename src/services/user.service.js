@@ -38,7 +38,8 @@ class UserService {
       user_id,
       devsensor_id,
       username: `${data.email.split("@")[0]}` || "",
-      password: hash
+      password: hash,
+      accountCreated: Date.now()
     });
 
     const newDevice = new Device({

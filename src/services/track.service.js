@@ -239,6 +239,7 @@ class Track {
     const devices = user?.fcm_token;
     
     const sendNotificationPromises = [];
+    const imageLink = "https://raw.githubusercontent.com/Axgura-mafia/DevSensorHomePage/main/public/devsensor_logo_image.png" || "https://pbs.twimg.com/profile_images/1710830966212620288/5UPzHw2W_400x400.jpg"
 
     for (let i = 0; i < devices?.length; i++) {
       const registrationToken = devices[i]?.token;
@@ -252,7 +253,7 @@ class Track {
           data: {
             title,
             body: description,
-            icon: "https://pbs.twimg.com/profile_images/1710830966212620288/5UPzHw2W_400x400.jpg",
+            icon: imageLink,
             link_url: link || URL?.DASHBOARD_URL,
           },
         };
@@ -271,6 +272,8 @@ class Track {
     const notifications = await Notifications.find({ user_id }).sort({
       date: -1,
     });
+
+    console.log({ timestamps })
 
     const getLastNotificationOfType = (type) => {
       const notificationOfType = notifications.find((n) => n?.type === type);
@@ -336,7 +339,7 @@ class Track {
     const user = await User.findOne({ user_id });
     if (!user) throw new CustomError("User not located..", 400);
     const { workout, warning, alert, combined } =
-      await this.lastNotificationSent({ user_id, timestamps: user?.timestamps }); // Dates
+      await this.lastNotificationSent({ user_id, timestamps: user?.accountCreated }); // Dates
     const intervalToSendalert = await this.intervalToSendalert(user); // Sec
     const intervalToSendWorkout = await this.intervalToSendWorkout(user); // Sec
     const { lastSittingTime, period } = await this.lastAvgSittingTime(

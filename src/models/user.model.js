@@ -167,7 +167,11 @@ const UserSchema = new Schema(
     onStart:{
        type:Date,
        default: Date.now()
-    }
+    },
+    accountCreated: {
+      type: Date,
+      default: Date.now()
+    },
   },
   {
     timestamps: true,
