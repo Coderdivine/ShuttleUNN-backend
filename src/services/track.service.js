@@ -237,6 +237,7 @@ class Track {
     }
 
     const devices = user?.fcm_token;
+    console.log({ devices })
     const sendNotificationPromises = [];
 
     for (let i = 0; i < devices?.length; i++) {
@@ -798,7 +799,7 @@ class Track {
     })
       .sort({ date: -1 })
       .limit(2) || null;
-    console.log({ messageToSend });
+
 
     let messageCount = 0;
     const sendNotificationsPromises = [];

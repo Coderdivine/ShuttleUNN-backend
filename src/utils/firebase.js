@@ -10,14 +10,26 @@ admin.initializeApp({
 class PushMessage {
 
     async sendMessage({ message, user }) {
+      const token = user?.fcm_token;
       if(!message) throw new CustomError("Please provide message to send.", 400);
-      const response = await admin
+      await admin
       .messaging()
-      .send(message);
+      .send(message)
+      .then((response) => {
+        if(!response) throw new CustomError("Unable to send push message to user", 400);
+        return response;
+      })
+      .catch(async (error)=> {
+        const err_msg = error?.errorInfo?.message || "Unable to send push message to user";
+        if(err_msg !== 'Requested entity was not found.') throw new CustomError(err_msg, 400);
+        user.fcm_token = this.deleteById(token, message?.token)
+        const saved = await user.save();
+        return {};
+      });
+    }
 
-      console.log({ response });
-      if(!response) throw new CustomError("Unable to send push message to user", 400);
-      return response;
+    deleteById(arr, idToDelete) {
+    return arr.filter(obj => obj.id !== idToDelete);
     }
 }
 
