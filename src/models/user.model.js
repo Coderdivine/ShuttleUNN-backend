@@ -104,7 +104,7 @@ const UserSchema = new Schema(
     },
     track_frequency: {
       type: String,
-      default: 60,
+      default: 300,
     },
     initialAuthentication: {
       type: String,
@@ -150,7 +150,7 @@ const UserSchema = new Schema(
     },
     useProfileForWorkout: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     lastMessageSentDate:{
       type:Date,
@@ -171,6 +171,10 @@ const UserSchema = new Schema(
     accountCreated: {
       type: Date
     },
+    isNewUser: {
+      type: Boolean,
+      required: false
+    }
   },
   {
     timestamps: true,

@@ -339,7 +339,7 @@ class Track {
     const user = await User.findOne({ user_id });
     if (!user) throw new CustomError("User not located..", 400);
     const { workout, warning, alert, combined } =
-      await this.lastNotificationSent({ user_id, timestamps: user?.accountCreated }); // Dates
+      await this.lastNotificationSent({ user_id, timestamps: user?.accountCreated });
     const intervalToSendalert = await this.intervalToSendalert(user); // Sec
     const intervalToSendWorkout = await this.intervalToSendWorkout(user); // Sec
     const { lastSittingTime, period } = await this.lastAvgSittingTime(
@@ -361,7 +361,8 @@ class Track {
         ],
         lastSittingTime,
         period,
-        user_id
+        user_id,
+        isNewUser: user?.isNewUser 
        });
 
     const sendNotification = await this.sendNotification(
@@ -370,6 +371,11 @@ class Track {
       timeUnit,
       Countdowns
     );
+
+    if(user?.isNewUser) {
+      user.isNewUser = false;
+      const savedToOldUser = await user.save();
+    }
     return sendNotification;
   }
 
@@ -381,12 +387,13 @@ class Track {
       dynamicCountdowns,
       lastSittingTime,
       period,
+      isNewUser
     } = data;
 
     // Check if the period in seconds is greater than 24hrs in seconds
     // useTimer if new user? " Check Date.now() > accountCreated : Perform countdowns " ...
 
-    const useTimer = false // period < 24 * 60 * 60;
+    const useTimer = isNewUser // period < 24 * 60 * 60;
 
     // const Countdowns = if initalCountdowns? create a function to map the values(Numbers) in descending order: else create a function to map the values(date) in descending order
     const initalCountdownsAvg = this.calculateAverage(initalCountdowns);
@@ -452,11 +459,6 @@ class Track {
     const firstCondition = Math.round(
       Date.now() / 1000 - lastSittingTimenewDate / 1000
     );
-
-
-
-
-
 
     const isTimeToPush = useTimer
       ? diffInSeconds > duration
