@@ -37,6 +37,7 @@ async combineAlert(data) {
                         2. Time for a simple exercises,
                         3. Try this <duration e.g. 2 minutes>
                         4. Recent posture exercises to do
+                        5. Posture Improvement for Software Engineers
                         `,
                     },
                     notification_notification_text: {

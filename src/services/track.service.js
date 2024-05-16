@@ -606,16 +606,16 @@ class Track {
   async useProfile(user_id) {
     const user = await User.findOne({ user_id });
     const profile = user?.useProfileForWorkout;
-    if (user && profile) {
+    if (user && profile && (user.occupation !== "No occupation")) {
       const returnedText = `
       Consider this information as a reference: the user's age is ${user?.age}, 
-      identified as ${user?.gender}, engaged in ${user?.occupation}
+      identified as ${user?.gender}, occupation: ${user?.occupation}
       with a weight of ${user?.weight} and a height of ${user?.height}.
       hobby: ${user?.hobby}.
       `;
       return returnedText;
     } else {
-      return "";
+      return "User does not have a profile yet. Tell user to update profile if chat is relating to: height, weight, age, gender, occupation and hobby";
     }
   }
 
@@ -763,7 +763,7 @@ class Track {
         (p) =>
           `-> had body posture: ${p.posture_name}  on ${p.date}. ;`
       )
-      .join("") || "No posture yet";
+      .join("") || "User does not have a posture yet";
       //at ${p.posture_accuracy}% accuracy
   }
 
