@@ -159,11 +159,11 @@ class Track {
       user.alertInterval,
     ]);
     const limit = Math.round(intervalAvg / user?.track_frequency);
-    // console.log({ intervalAvg, limit });
+    const isNewUser = user?.isNewUser;
 
     const posture = await Posture.find({ user_id })
       .sort({ date: -1 })
-      .limit(limit);
+      .limit(isNewUser ? 5 : 14 );
     return posture;
   }
 

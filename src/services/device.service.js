@@ -158,9 +158,7 @@ class DeviceService {
           },
         };
 
-        const sendNotificationPromise = await PushNotification.sendMessage(
-          message
-        );
+        const sendNotificationPromise = await PushNotification.sendMessage({ message, user });
         sendNotificationPromises.push(sendNotificationPromise);
       }
     }

@@ -104,7 +104,7 @@ const UserSchema = new Schema(
     },
     track_frequency: {
       type: String,
-      default: 300,
+      default: 126,
     },
     initialAuthentication: {
       type: String,
@@ -124,11 +124,11 @@ const UserSchema = new Schema(
     },
     alertInterval: {
       type: Number,
-      default: 2700,
+      default: 2400,
     },
     workoutAlert: {
       type: Number,
-      default: 2800,
+      default: 2400,
     },
     fcm_token: {
       type: [
@@ -162,7 +162,7 @@ const UserSchema = new Schema(
     },
     enableMagicFix:{
       type: Boolean,
-      default: false
+      default: true
     },
     onStart:{
        type:Date,
