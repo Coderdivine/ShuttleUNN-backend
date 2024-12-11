@@ -1,8 +1,8 @@
 require("express-async-errors");
 const app = require("express")();
-require("./v2/middlewares/pre-route.middleware")(app);
-app.use(require("./v2/routes"));
-require("./v2/middlewares/error.middleware")(app);
+require("./v1/middlewares/pre-route.middleware")(app);
+app.use(require("./v1/routes"));
+require("./v1/middlewares/error.middleware")(app);
 const PORT = process.env.PORT || 5001;
 const passport = require("passport");
 const passportSetup = require("./Passport");
@@ -31,7 +31,7 @@ app.use(passport.initialize());
 app.use(passport.session()); 
 
 app.listen(PORT, async () => {
-  require("./v2/database/mongo");
+  require("./v1/database/mongo");
   console.log(`:::> Server listening on port ${PORT} http://localhost:${PORT}`);
 });
 
