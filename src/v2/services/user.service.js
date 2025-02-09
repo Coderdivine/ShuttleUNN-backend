@@ -35,7 +35,7 @@ class UserService {
     const finEmail = await User.findOne({ email: data.email });
     if (finEmail)
       throw new CustomError(
-        "Email already registered. Please choose another one."
+        "Email already registered"
       );
 
     if (!data.email.includes("@"))
@@ -85,9 +85,7 @@ class UserService {
   async login(data) {
     const email = data.email;
     const user_data = await User.findOne({ email });
-    console.log({ user_data });
-
-    if (!user_data) throw new CustomError("Wrong email address", 404);
+    if (!user_data) throw new CustomError("User not registered", 404);
 
     const decoded_hash = await bcrypt.compare(
       data.password,
@@ -140,6 +138,8 @@ class UserService {
   async resetPassword(data) {
     const { email } = data;
     if (!data.email) throw new CustomError("User email is needed", 400);
+    const user = await User.findOne({ email });
+    if(!user) throw new CustomError("No user found with this email address", 404);
     const findAndDeleteEmail = await VToken.deleteMany({ email: data.email });
     console.log({ findAndDeleteEmail });
     const otp = await randonNum.randomNum();

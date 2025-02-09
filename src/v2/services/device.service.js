@@ -1,8 +1,9 @@
-const { BCRYPT_SALT, URL } = require("../config");
+const { BCRYPT_SALT, URL, SCHEDULE_SECRET } = require("../config");
 const User = require("../models/user.model");
 const Device = require("../models/device.model");
 const CustomError = require("../utils/custom-error");
 const { response } = require("express");
+const crypto = require("crypto");
 const Posture = require("../models/posture.model");
 const PushNotification = require("../utils/firebase");
 
@@ -91,7 +92,7 @@ class DeviceService {
     }
     return {
       bool: true,
-      message: "Frequency is okay",
+      message: "Frequency is Okay",
     };
   }
 
@@ -191,7 +192,47 @@ class DeviceService {
     } else {
       return { bool: false };
     }
-}
+  }
+
+  async syncDevice(devsensor_id, generatedCode, access) {
+    await this.makeCheck({ access, devsensor_id });
+    const user = await User.findOne({ devsensor_id  });
+    if(!devsensor_id) throw new CustomError("Please provide a devsensor_id", 400);
+    if(!generatedCode) throw new CustomError("No link code detected. Please regenerated the QRCode", 400);
+    if(!user) throw new CustomError("Please create a DevSensor account", 400);
+    const linkCode = generatedCode;
+    user.linkCode = linkCode;
+    user.isLinked = true;
+    return await user.save();
+  }
+
+  async makeCheck(schedulerData) {
+    const { access, devsensor_id } = schedulerData;
+    if (!devsensor_id)
+      throw new CustomError("Please provide a DevSensor ID", 400);
+    const user = await User.findOne({ devsensor_id });
+    if(!user) throw new CustomError("You don't have acces to this ID.", 400);
+    const expectedAccess = this.generateAccessSignature(user?.password);
+    if (access !== expectedAccess)
+      throw new CustomError(
+        "Access not authorized. Please visit DevSensor Dashboard again",
+        400
+      );
+  }
+
+  generateAccessSignature(hashedPassword) {
+    const secretKey = SCHEDULE_SECRET;
+    const createdHash = crypto
+    .createHmac("sha256", secretKey)
+    .update(hashedPassword)
+    .digest("hex");
+    return createdHash;
+  }
+
+  async checkIfDeviceIsSynced(linkCode) {
+    const user = await User.findOne({ linkCode });
+    return user || 0;
+  }
 
 }
 

@@ -30,6 +30,14 @@ const MagicFixMessage = new Schema(
         type:String,
         required: false
     },
+    isAudio: {
+      type: Boolean,
+      default: false
+    },
+    filePath: {
+        type: String,
+        default: null
+    },
     date:{  
         type: Date,
         default: Date.now()

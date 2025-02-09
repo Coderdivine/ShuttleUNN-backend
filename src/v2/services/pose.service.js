@@ -5,8 +5,11 @@ const Range = require("../models/range.model");
 const RangeScore = require("../models/range-score.model");
 const moment = require("moment");
 const gemini = require("../utils/ai/gemini.ai");
+const openai = require("../utils/ai/open.ai");
+
 
 class PoseService {
+  
   async savePoseEstimation(data) {
     if (!data.devsensor_id)
       throw new CustomError(
@@ -45,8 +48,138 @@ class PoseService {
       devsensor_id,
       user_id: user?.user_id,
     });
+
     await newScore.save();
-    return this.similarPose(data, data.devsensor_id, user.user_id);
+    return await this.similarPose(data, data.devsensor_id, user.user_id);
+  }
+
+  async getAnalysis(devsensor_id) {
+    try {
+      const currentMoment = moment();
+      const currentHour = currentMoment.hour();
+
+      const startOfDay = moment().startOf('day');
+      const endOfDay = moment().endOf('day');
+  
+      const poses = await Pose.aggregate([
+        {
+          $match: {
+            devsensor_id: devsensor_id,
+            timestamp: { 
+              $gte: startOfDay.toDate(), 
+              $lte: endOfDay.toDate() 
+            },
+            isDuplicate: false
+          }
+        },
+        {
+          $group: {
+            _id: {
+              hour: { $hour: "$timestamp" }
+            },
+            pose: { $last: "$$ROOT" },
+            timestamp: { $last: "$timestamp" }
+          }
+        },
+        { $sort: { timestamp: -1 } }
+      ]);
+  
+      if (poses.length === 0) {
+        return {
+          success: true,
+          message: "No posture data available for today",
+          data: [],
+          hours: 0,
+          currentTime: currentMoment.format('MMMM D, YYYY h:mm A')
+        };
+      }
+  
+      const processedPoses = poses.map(hourlyData => {
+        const { pose } = hourlyData;
+        
+        const neckAngle = this.calculateAngle(pose.keypoints, 'neck');
+        const shoulderAngle = this.calculateAngle(pose.keypoints, 'shoulder');
+        const waistAngle = this.calculateAngle(pose.keypoints, 'waist');
+        
+        const quality = this.determinePostureQuality(neckAngle, shoulderAngle, waistAngle);
+  
+        return {
+          timestamp: moment(pose.timestamp).format('h:mm A'),
+          hour: moment(pose.timestamp).hour(),
+          neckAngle,
+          shoulderAngle,
+          waistAngle,
+          quality,
+          raw_timestamp: pose.timestamp
+        };
+      });
+
+      const recentPoses = processedPoses.slice(0, 5);
+      let message = "";
+      if (recentPoses.length === 1) {
+        message = `Latest posture data available at ${recentPoses[0].timestamp}`;
+      } else {
+        message = `Showing most recent ${recentPoses.length} posture readings from today`;
+      }
+
+      const dataAvailability = {
+        totalPosesForToday: poses.length,
+        mostRecentTimestamp: moment(poses[0].timestamp).format('h:mm A'),
+        currentTime: currentMoment.format('h:mm A'),
+        timeSinceLastPose: moment.duration(currentMoment.diff(poses[0].timestamp)).humanize()
+      };
+  
+      return {
+        success: true,
+        message,
+        data: recentPoses,
+        hours: recentPoses.length,
+        dataAvailability,
+        currentTime: currentMoment.format('MMMM D, YYYY h:mm A')
+      };
+  
+    } catch (error) {
+      console.error('Error in getAnalysis:', error);
+      return {
+        success: false,
+        message: "Error analyzing posture data",
+        error: error.message,
+        data: [],
+        hours: 0
+      };
+    }
+  }
+
+  calculateAngle(keypoints, type) {
+    try {
+      const relevantPoints = keypoints.filter(kp => 
+        kp.label.toLowerCase().includes(type.toLowerCase())
+      );
+      
+      if (relevantPoints.length < 2) {
+        return 0;
+      }
+  
+      const angle = Math.abs(
+        Math.atan2(
+          relevantPoints[1].y - relevantPoints[0].y,
+          relevantPoints[1].x - relevantPoints[0].x
+        ) * (180 / Math.PI)
+      );
+  
+      return Math.round(angle);
+    } catch (error) {
+      console.error(`Error calculating ${type} angle:`, error);
+      return 0;
+    }
+  }
+  
+  determinePostureQuality(neckAngle, shoulderAngle, waistAngle) {
+    const isGoodNeck = neckAngle < 20;
+    const isGoodShoulder = shoulderAngle < 15;
+    const isGoodWaist = waistAngle < 10;
+  
+    return (isGoodNeck && isGoodShoulder && isGoodWaist) ? 'good' : 'poor';
   }
 
   async recentPoseEstimate(devsensor_id) {
@@ -71,10 +204,10 @@ class PoseService {
     if (lastPose && arePosesSimilar(data, lastPose)) {
       return await Pose.findByIdAndUpdate(lastPose._id, {
         $push: { duplicateTimestamps: Date.now() },
-        $set: { isDuplicate: true },
+        $set: { isDuplicate: true, timeStamp: Date.now()  },
       });
     } else {
-      const newPoseEstimate = new Pose({ ...data, user_id: user_id });
+      const newPoseEstimate = new Pose({ ...data, user_id: user_id, timestamp: Date.now() });
       return await newPoseEstimate.save();
     }
   }
@@ -142,7 +275,7 @@ class PoseService {
 
     if (!poses.length) {
       return {
-        message: "Device is tracking",
+        message: "Device is tracking, most angles captured are duplicates",
       };
     }
 

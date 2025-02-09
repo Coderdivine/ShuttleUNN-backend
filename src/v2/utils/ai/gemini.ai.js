@@ -1,9 +1,11 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { GeminiAI: GeminiAIConfig } = require("../../config");
 const genAI = new GoogleGenerativeAI(GeminiAIConfig.API_KEY);
-const fs = require("fs");
+const fs = require("fs/promises");
 const path = require("path");
+const moment = require("moment");
 const fileContent = path.join(__dirname, "../doctor.txt");
+const fileConversationContent = path.join(__dirname, "../conversation.txt");
 
 class GeminiAI {
 
@@ -75,8 +77,7 @@ class GeminiAI {
           },
         },
       ]);
-
-      console.log(result2.response.text());
+      
       return {
         message: result2.response.text(),
         values: apiResponse,
@@ -91,7 +92,7 @@ class GeminiAI {
 
   async createPrompt({ postureAngles }) {
     const postureTxt = await this.createPostureText(postureAngles);
-    const fileContentText = await this.fileContentTxt();
+    const fileContentText = await this.fileContentTxt(fileContent);
     const secondPrompt = `
                 You are a rehabilitation expert and ergonomics coach. The user has provided data about their current posture. Based on the user's posture, evaluate their health and productivity. Here are the steps to follow:
 
@@ -131,14 +132,14 @@ class GeminiAI {
       return outputs || "User doesn't have any record yet. just return a good score";
   }
 
-  async fileContentTxt() {
-    return fs.readFile(fileContent, "utf8", (err, data) => {
-      if (err) {
-        console.error("Error reading the file:", err);
-        return;
-      }
-      return data;
-    });
+  async fileContentTxt(file) {
+    try {
+      const text = await fs.readFile(file, "utf8");
+      return text;
+    } catch (err) {
+      console.error("Error reading the file:", err);
+      return "";
+    }
   }
 
   async theRating(health, productivity, reason, guidance) {
@@ -149,8 +150,28 @@ class GeminiAI {
       guidance,
     };
   }
+
+  async createConversationTxt(object) {
+    const now = moment().toDate();
+    const fileConversationContentTxt = await this.fileContentTxt(fileConversationContent);
+    const { dateInText, scheduledConversation } = object;
+    const prompt = `
+      Create a message telling user it's time to have a ${scheduledConversation} with DevSensor.
+      Also determine the current difference between the actual scheduled time for the conversation.
+      scheduled date is ${dateInText} and current date is ${now}. Always reference aas "We"
+      Please keep it very brief and human like response using simple and understandable words.
+      Here are the details you need to know about type of conversation: 
+      ${fileConversationContentTxt}
+    `;
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    console.log(result.response.text());
+    return result?.response.text()??"";
+  }
+
 }
 
 module.exports = new GeminiAI();
 
-// new GeminiAI().useGemini({ postureAngles: { middle: [{ from: 5, to: 45, label: "neck" }] }})
+// new GeminiAI().useGemini({ postureAngles: { middle: [{ from: 5, to: 45, label: "neck" }] }});
+// new GeminiAI().createConversationTxt({ dateInText:" 10:09 AM", scheduledConversation: "Workout Conversation" });

@@ -48,6 +48,17 @@ class PoseController {
     res.status(200).send(response("Pose Score", result));
   }
 
+  async getAnalysis(req, res) {
+    if (!req.params) throw new CustomError("No parameter passed.", 400);
+    const result = await PoseService.getAnalysis(req.params.devsensor_id);
+    if (!result)
+      throw new CustomError(
+        "No result returned. Please make sure your device is activated.",
+        400
+      );
+    res.status(200).send(response("Pose Analysis", result));
+  }
+
 }
 
 module.exports = new PoseController();

@@ -1,2 +1,4 @@
 .env
 node_modules
+utils
+src/v2/utils/drive/devsensorbucket.json

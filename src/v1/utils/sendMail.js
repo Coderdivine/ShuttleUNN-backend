@@ -4,14 +4,16 @@ require("dotenv").config();
 const nodemailer = require('nodemailer');
 const user = process.env.EMAIL_ADDRESS
 const password = process.env.EMAIL_PASSWORD;
-const WaitList = require("../models/waitlist.model")
+const WaitList = require("../models/waitlist.model");
+const { mailer } = require("../config");
+
 
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user:user,
-      pass:password
+      user: mailer.USER,
+      pass: mailer.PASSWORD
     }
 });
 
@@ -19,12 +21,6 @@ async function sendMail({
     email,
 }){
   const name = email.split("@")[0];
-  console.log({ name })
-
-    console.log({
-      email
-    });
-
     const html = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="font-family:arial, 'helvetica neue', helvetica, sans-serif">
     <head>

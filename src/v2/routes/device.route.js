@@ -17,6 +17,8 @@ router.get("/enable-device/:devsensor_id", DeviceCtrl.enableDevice);
 router.get("/disconnect-wifi/:devsensor_id", DeviceCtrl.disconnectWifi);
 router.get("/device-start/:devsensor_id", DeviceCtrl.onStart);
 router.get("/device-active/:devsensor_id", DeviceCtrl.isActive);
+router.get("/link/:link_code", DeviceCtrl.checkIfDeviceIsSynced);
+router.post("/sync-device", DeviceCtrl.syncDevice);
 
 
 

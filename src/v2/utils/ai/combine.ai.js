@@ -14,24 +14,22 @@ async combineAlert(data) {
     const { postures, profile } = data;
     const current_date = Date.now();
     const createMessage = `
-    Be a posture instructor. based on user's postures, create a summary warning user about his/her recent posture and also recommend a suitable exercises based on the user's postures.
-    here's the user's recent postures:
-    ${postures}, current date: ${current_date}.
-    ${profile}
-    `;
+    You are a rehabilitation expert and ergonomics coach. The user has provided data about his/her profile and their current posture. 
+    Based on the user's posture and profile, In human like response, evaluate their health and productivity. 
+    3. Provide a summary of the user's posture health.
+    4. Recommend suitable exercises to improve their posture and overall health. ${profile},
+    ${postures}, current date: ${current_date}.`;
     const messages = [{ role: "user", content: createMessage }];
     const functions = [
         {
             name: "create_workout",
-            description: `Be a posture instructor. based on user posture, create a summary warning user about thier recent posture and also recommend a suitable exercises based on that posture.
-        here's the user's recent posture.
-        `,
+            description: `You are a rehabilitation expert and ergonomics coach. The user has provided data about his/her profile and their current posture.`,
             parameters: {
                 type: "object",
                 properties: {
                     summary: {
                         type: "string",
-                        description: `Create a notification summary based on user posture and actual date/time. make sure it doesn't exceed 60 words,
+                        description: `Create a notification summary based on user information and posture and actual date/time. make sure it doesn't exceed 60 words,
                         e.g 
                         1. Time for a exercises,
                         2. Time for a simple exercises,

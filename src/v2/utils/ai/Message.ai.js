@@ -14,7 +14,10 @@ class MessageAI {
     const { message, recentPosture, recentWorkoutGiven, recentMessages, useProfile } =
       data;
     const current_date = Date.now();
-    const createMessage = `message => ${message}. to answer, please note: user recent postures: ${recentPosture}, and also User was given to following exercises to do, (Not all exercises was done): ${recentWorkoutGiven}. Note: today is ${current_date}. Here are things you need to know about user(Profile): ${useProfile}`;
+    const createMessage = `
+    You are a rehabilitation expert and ergonomics coach. The user has provided data about his/her profile and their current posture. Always make sure the response is simple and human-like always.
+    ${message}. Note: today is ${current_date}. Make use of this information always: ${useProfile}.
+     to answer, please note: user recent postures: ${recentPosture}, and also User was given to following exercises to do, (Not all exercises was done): ${recentWorkoutGiven}.`;
     const messages = [
         { role: "assistant", content: `Be a posture, healthy, and productive assistant named Magic Fix, help user achieve good posture, healthy, and productive lifestyle. feel free to answer any other questions concerning the user: hobby, posture, body building, sitting time and all. here are things you need to know about user: ${useProfile}. Also please be a posture and productive assitant and explain user's part of the body for exmaple: ${this.affectedPartsInText()}. Also help the user answer any health question with or without a '?' concerning human body`},
         ...recentMessages,

@@ -175,7 +175,11 @@ const UserSchema = new Schema(
       type: Boolean,
       required: false
     },
-    access: { type: String }
+    access: { type: String },
+    linkCode: {
+      type: String,
+      required: false
+    }
   },
   {
     timestamps: true,

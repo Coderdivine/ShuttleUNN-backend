@@ -35,9 +35,12 @@ app.listen(PORT, async () => {
   console.log(`:::> Server listening on port ${PORT} http://localhost:${PORT}`);
 });
 
+
 // On server error
 app.on("error", (error) => {
   console.error(`<::: An error occurred on the server: \n ${error}`);
 });
+
+
 
 module.exports = app;

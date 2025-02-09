@@ -8,6 +8,7 @@ router.post("/pose-estimate", PoseCtrl.savePoseEstimation);
 router.get("/recent-pose/:devsensor_id/", PoseCtrl.recentPoseEstimate);
 router.get("/avg-pose-angle/:devsensor_id/", PoseCtrl.getAvgPoseAngle);
 router.get("/pose-score/:devsensor_id/", PoseCtrl.getPoseScore);
+router.get("/pose-analysis/:devsensor_id/", PoseCtrl.getAnalysis);
 
 
 module.exports = router;

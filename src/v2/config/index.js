@@ -1,8 +1,8 @@
 const config = {
-    APP_NAME: "DevSensor.",
+    APP_NAME: "DevSensor",
     JWT_SECRET: process.env.JWT_SECRET || "000-12345-000",
     SCHEDULE_SECRET: process.env.SCHEDULE_SECRET || "",
-    MONGODB_URI: process.env.MONGO_ATLAS_URI || "mongodb://localhost:27017", // "mongodb+srv://chimdi:chimdi@cluster0.5zspaed.mongodb.net/?retryWrites=true&w=majority",
+    MONGODB_URI: process.env.MONGO_ATLAS_URI || "mongodb://localhost:27017",
     BCRYPT_SALT: process.env.BCRYPT_SALT || 10,
     role: {
         USER: ["user", "admin"],
@@ -18,12 +18,17 @@ const config = {
         PASSWORD: process.env.MAILER_PASSWORD || "password",
         PORT: process.env.MAILER_PORT || 465,
         SECURE: process.env.MAILER_SECURE || true,
-        DOMAIN: "https://mailing.axgura.com"
+        DOMAIN: "https://devsensor.axgura.com"
     },
     GeminiAI: {
         PROJECT_ID: process.env.GENERATIVE_AI_PROJECT_ID,
         LOCATION: process.env.GENERATIVE_AI_LOCATION,
         API_KEY: process.env.GENERATIVE_AI_API_KEY,
+    },
+    BUCKET: {
+        projectId: process.env.BUCKET_PROJECT_ID,
+        BUCKET_NAME: process.env.BUCKET_NAME,
+        KEYFILENAME: process.env.KEYFILENAME
     },
     AffectedBodyParts: [
         "Left_Pec_Mayoris",
@@ -86,7 +91,7 @@ const config = {
         "CALVES",
         "PERONEALS",
         "PERONEALS"
-      ]
+    ]
             
 };
 

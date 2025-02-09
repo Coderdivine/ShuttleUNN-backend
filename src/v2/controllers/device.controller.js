@@ -132,6 +132,21 @@ class DeviceController {
     const result = await DeviceService.isActive(devsensor_id);
     res.status(201).send(response("recently tracked?", result));
   }
+
+  async syncDevice(req, res) {
+    if (!req.body) throw new CustomError("No parameter passed.", 400);
+    const { devsensor_id, generatedCode, access } = req.body;
+    const result = await DeviceService.syncDevice(devsensor_id, generatedCode, access);
+    res.status(201).send(response("Device Synced", result));
+  }
+
+  async checkIfDeviceIsSynced(req, res) {
+    if (!req.params) throw new CustomError("No parameter passed.", 400);
+    const { link_code } = req.params;
+    const result = await DeviceService.checkIfDeviceIsSynced(link_code);
+    res.status(201).send(response("Device Synced", result));
+  }
+
 }
 
 module.exports = new DeviceController();
