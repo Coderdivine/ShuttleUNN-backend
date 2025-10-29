@@ -1,6 +1,6 @@
 const config = {
-    APP_NAME: "DevSensor",
-    JWT_SECRET: process.env.JWT_SECRET || "000-12345-000",
+    APP_NAME: "backend",
+    JWT_SECRET: process.env.JWT_SECRET || "000-xxxxx-000",
     SCHEDULE_SECRET: process.env.SCHEDULE_SECRET || "",
     MONGODB_URI: process.env.MONGO_ATLAS_URI || "mongodb://localhost:27017",
     BCRYPT_SALT: process.env.BCRYPT_SALT || 10,
@@ -9,8 +9,8 @@ const config = {
         ADMIN: ["admin"]
     },
     URL: {
-        LANDING_URL: process.env.LANDING_URL || "https://devsensor-frontend.vercel.app",
-        DASHBOARD_URL: process.env.DASHBOARD_URL || "https://devsensor-frontend.vercel.app/dashboard"
+        LANDING_URL: process.env.LANDING_URL || "https://backend-frontend.vercel.app",
+        DASHBOARD_URL: process.env.DASHBOARD_URL || "https://backend-frontend.vercel.app/dashboard"
     },
     mailer: {
         HOST: process.env.MAILER_HOST || "smtp.gmail.com",
@@ -18,7 +18,7 @@ const config = {
         PASSWORD: process.env.MAILER_PASSWORD || "password",
         PORT: process.env.MAILER_PORT || 465,
         SECURE: process.env.MAILER_SECURE || true,
-        DOMAIN: "https://devsensor.axgura.com"
+        DOMAIN: "https://backend.axgura.com"
     },
     GeminiAI: {
         PROJECT_ID: process.env.GENERATIVE_AI_PROJECT_ID,
@@ -29,70 +29,7 @@ const config = {
         projectId: process.env.BUCKET_PROJECT_ID,
         BUCKET_NAME: process.env.BUCKET_NAME,
         KEYFILENAME: process.env.KEYFILENAME
-    },
-    AffectedBodyParts: [
-        "Left_Pec_Mayoris",
-        "Right_Pec_Mayoris",
-        "Left_Rectus_Abdominis",
-        "Left_Oblique",
-        "Right_Oblique",
-        "Right_Biceps_Brachii_Long_Head",
-        "Left_Neck",
-        "Right_Neck",
-        "Left_Deltoids_Front",
-        "Right_Deltoids_Front",
-        "Head_Front",
-        "GROINS",
-        "GROINS",
-        "QUADS",
-        "QUADS",
-        "Right_Knee_Front",
-        "Left_Tibialis_Anterior",
-        "Left_Shin",
-        "Right_Shin",
-        "Right_Tibialis_Anterior",
-        "Right_Brachioradialis",
-        "QUADS",
-        "Left_Knee_Front",
-        "QUADS",
-        "QUADS",
-        "QUADS",
-        "Left_Trapezius",
-        "Right_Trapezius",
-        "Left_Deltoids_Back",
-        "Right_Deltoids_Back",
-        "Left_Latissimus_Dorsi",
-        "Right_Latissimus_Dorsi",
-        "Left_Triceps_Lateral",
-        "Right_Triceps_Lateral",
-        "Left_Triceps_Medial",
-        "Right_Triceps_Medial",
-        "Left_Erector_Spinae",
-        "Right_Erector_Spinae",
-        "Right_Extensor_Digitorum",
-        "Right_Flexor_Carpi",
-        "Left_Extensor_Digitorum",
-        "Right_Flexor_Carpi",
-        "GLUTES",
-        "GLUTES",
-        "GROINS",
-        "GROINS",
-        "HAMSTRINGS",
-        "HAMSTRINGS",
-        "HAMSTRINGS",
-        "HAMSTRINGS",
-        "Left_Knee_Back",
-        "Right_Knee_Back",
-        "CALVES",
-        "CALVES",
-        "CALVES",
-        "CALVES",
-        "CALVES",
-        "CALVES",
-        "PERONEALS",
-        "PERONEALS"
-    ]
-            
+    }       
 };
 
 module.exports = config;
