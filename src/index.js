@@ -3,7 +3,7 @@ const app = require("express")();
 require("./v2/middlewares/pre-route.middleware")(app);
 app.use(require("./v2/routes"));
 require("./v2/middlewares/error.middleware")(app);
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 2060;
 const cookieSession = require("cookie-session");
 const rateLimit = require('express-rate-limit');
 const useragent = require('express-useragent');

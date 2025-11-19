@@ -15,10 +15,13 @@ module.exports = (app) => {
     });
 
     // enable CORS
-    app.use(cors({ origin: '*' }));
+    app.use(cors({ origin: '*', credentials: false }));
     
     // Secure the app by setting various HTTP headers off.
-    app.use(helmet({ contentSecurityPolicy: true }));
+    app.use(helmet({ 
+        contentSecurityPolicy: false,
+        crossOriginResourcePolicy: false
+    }));
 
     // Logger
     app.use(morgan("common"));

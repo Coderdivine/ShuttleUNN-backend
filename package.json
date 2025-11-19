@@ -1,7 +1,7 @@
 {
-  "name": "devsensor-backend",
+  "name": "shuttleUNN-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "ShuttleUNN Backend - Smart shuttle system for UNN campus",
   "main": "src/index.js",
   "scripts": {
     "test": "nodemon src/index.js",
@@ -55,13 +55,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://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@github.com/Axgura-mafia/DevSensorBackend.git"
+    "url": "https://github.com/Coderdivine/ShuttleUNN-Backend.git"
   },
-  "keywords": [],
-  "author": "Chimdi",
+  "keywords": [
+    "shuttle",
+    "unn",
+    "campus",
+    "mobility"
+  ],
+  "author": "ShuttleUNN Team",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Axgura-mafia/DevSensorBackend/issues"
+    "url": "https://github.com/Coderdivine/ShuttleUNN-Backend/issues"
   },
-  "homepage": "https://github.com/Axgura-mafia/DevSensorBackend#readme"
+  "homepage": "https://github.com/Coderdivine/ShuttleUNN-Backend#readme"
 }
