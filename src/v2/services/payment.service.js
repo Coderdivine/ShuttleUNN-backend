@@ -1,4 +1,6 @@
 require("dotenv").config();
+require("dotenv").config();
+const paystack = require("paystack")(process.env.PAYSTACK_SECRET_KEY);
 const axios = require("axios");
 const Student = require("../models/student.model");
 const Transaction = require("../models/transaction.model");
@@ -46,9 +48,10 @@ class PaymentService {
     const reference = `TOPUP-${uuidv4().slice(0, 8).toUpperCase()}-${Date.now()}`;
 
     try {
-      // Initialize payment with Paystack (Direct API)
+      // Initialize payment with Paystack npm package
       // Amount must be in kobo (multiply by 100)
-      const response = await paystackRequest.post("/transaction/initialize", {
+      const callbackUrl = process.env.DASHBOARD_URL || 'http://localhost:3000';
+      const response = await paystack.transaction.initialize({
         email: email,
         amount: amount * 100, // Convert to kobo
         reference: reference,
@@ -57,10 +60,10 @@ class PaymentService {
           student_name: `${student.firstName} ${student.lastName}`,
           purpose: "Wallet Top-up",
         },
-        callback_url: `${process.env.DASHBOARD_URL}/student/wallet?reference=${reference}`,
+        callback_url: `${callbackUrl}/student/wallet?reference=${reference}`,
       });
 
-      if (!response.data.status) {
+      if (!response.status) {
         throw new CustomError("Failed to initialize payment", 500);
       }
 
@@ -105,14 +108,14 @@ class PaymentService {
     }
 
     try {
-      // Verify payment with Paystack (Direct API)
-      const response = await paystackRequest.get(`/transaction/verify/${reference}`);
+      // Verify payment with Paystack npm package
+      const response = await paystack.transaction.verify(reference);
 
-      if (!response.data.status) {
+      if (!response.status) {
         throw new CustomError("Failed to verify payment", 500);
       }
 
-      const paymentData = response.data.data;
+      const paymentData = response.data;
 
       // Check if payment was successful
       if (paymentData.status !== "success") {
