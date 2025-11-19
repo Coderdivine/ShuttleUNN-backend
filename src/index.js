@@ -28,7 +28,7 @@ app.use("/", apiLimiter);
 
 app.listen(PORT, async () => {
   require("./v2/database/mongo");
-  console.log(`:::> Server listening on port ${PORT} http://localhost:${PORT}`);
+  console.log(`::::> Server listening on port ${PORT} http://localhost:${PORT}`);
 });
 
 
