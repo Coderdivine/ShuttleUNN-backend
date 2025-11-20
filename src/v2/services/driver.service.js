@@ -132,7 +132,7 @@ class DriverService {
     await driver.save();
 
     // Return driver without password
-    const driverData = driver.toObject();
+    const driverData = driver.toJSON();
     delete driverData.password;
 
     return driverData;
@@ -148,7 +148,7 @@ class DriverService {
       throw new CustomError("Driver not found", 404);
     }
 
-    const driverData = driver.toObject();
+    const driverData = driver.toJSON();
     delete driverData.password;
 
     return driverData;
@@ -191,10 +191,33 @@ class DriverService {
 
     // Update vehicle info if provided
     if (data.vehicleInfo) {
+      // Handle plateNumber as alias for registrationNumber
+      // Prevent plate number change if already set
+      if (data.vehicleInfo.plateNumber || data.vehicleInfo.registrationNumber) {
+        const newPlateNumber = (data.vehicleInfo.plateNumber || data.vehicleInfo.registrationNumber).toUpperCase().trim();
+        
+        if (driver.vehicleInfo && driver.vehicleInfo.registrationNumber) {
+          // Plate number already exists - don't allow changes
+          if (newPlateNumber !== driver.vehicleInfo.registrationNumber) {
+            throw new CustomError("Plate number cannot be changed once set", 400);
+          }
+        } else {
+          // First time setting plate number
+          driver.vehicleInfo.registrationNumber = newPlateNumber;
+        }
+      }
+      
       if (data.vehicleInfo.make) driver.vehicleInfo.make = data.vehicleInfo.make.trim();
       if (data.vehicleInfo.model) driver.vehicleInfo.model = data.vehicleInfo.model.trim();
       if (data.vehicleInfo.capacity) driver.vehicleInfo.capacity = data.vehicleInfo.capacity;
       if (data.vehicleInfo.color) driver.vehicleInfo.color = data.vehicleInfo.color.trim();
+      
+      // Handle assignedRoute field
+      if (data.vehicleInfo.assignedRoute !== undefined) {
+        driver.assignedRoute = data.vehicleInfo.assignedRoute ? data.vehicleInfo.assignedRoute.trim() : null;
+      }
+      
+      driver.markModified('vehicleInfo');
     }
 
     // Update bank details if provided
@@ -404,6 +427,63 @@ class DriverService {
     }
 
     return { message: "Account unsuspended successfully" };
+  }
+
+  async getStats(driver_id) {
+    if (!driver_id) {
+      throw new CustomError("Driver ID is required", 400);
+    }
+
+    const driver = await Driver.findOne({ driver_id });
+    if (!driver) {
+      throw new CustomError("Driver not found", 404);
+    }
+
+    // Get driver's assigned shuttle
+    const Shuttle = require("../models/shuttle.model");
+    const shuttle = await Shuttle.findOne({ assignedDriver: driver_id });
+    const Booking = require("../models/booking.model");
+
+    let totalEarnings = 0;
+    let totalTrips = 0;
+    let completedTrips = 0;
+
+    // Get bookings from official shuttle (if exists)
+    if (shuttle) {
+      const shuttleBookings = await Booking.find({ shuttle_id: shuttle.shuttle_id });
+
+      totalTrips += shuttleBookings.length;
+      completedTrips += shuttleBookings.filter(b => b.status === "completed").length;
+      totalEarnings += shuttleBookings
+        .filter(b => b.paymentStatus === "completed")
+        .reduce((sum, booking) => sum + (booking.fare || 0), 0);
+    }
+
+    // Also get QR payment bookings (for drivers without shuttles)
+    const qrBookings = await Booking.find({ 
+      shuttle_id: `QR-${driver_id}`,
+      paymentMethod: "qrcode"
+    });
+
+    if (qrBookings.length > 0) {
+      totalTrips += qrBookings.length;
+      completedTrips += qrBookings.filter(b => b.status === "completed").length;
+      totalEarnings += qrBookings
+        .filter(b => b.paymentStatus === "completed")
+        .reduce((sum, booking) => sum + (booking.fare || 0), 0);
+    }
+
+    return {
+      driver_id: driver.driver_id,
+      totalEarnings,
+      totalTrips,
+      completedTrips,
+      rating: driver.rating,
+      ratingCount: driver.ratingCount,
+      status: driver.status,
+      vehicleInfo: driver.vehicleInfo,
+      assignedRoutes: driver.assignedRoutes,
+    };
   }
 }
 

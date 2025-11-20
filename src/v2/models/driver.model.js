@@ -93,6 +93,11 @@ const DriverSchema = new Schema(
         },
       },
     ],
+    assignedRoute: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     bankDetails: {
       accountName: {
         type: String,
@@ -154,6 +159,15 @@ const DriverSchema = new Schema(
   {
     timestamps: true,
     collection: "drivers",
+    toJSON: {
+      transform: function(doc, ret) {
+        // Add plateNumber as an alias for registrationNumber in vehicleInfo
+        if (ret.vehicleInfo && ret.vehicleInfo.registrationNumber) {
+          ret.vehicleInfo.plateNumber = ret.vehicleInfo.registrationNumber;
+        }
+        return ret;
+      }
+    }
   }
 );
 

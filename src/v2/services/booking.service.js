@@ -352,6 +352,112 @@ class BookingService {
       hasMore: skip + limit < total,
     };
   }
+
+  async getDriverBookings(driver_id, limit = 20, skip = 0) {
+    if (!driver_id) {
+      throw new CustomError("Driver ID is required", 400);
+    }
+
+    try {
+      console.log("=== getDriverBookings START ===");
+      console.log("Driver ID:", driver_id);
+
+      // Get driver's assigned shuttle
+      const Shuttle = require("../models/shuttle.model");
+      const shuttle = await Shuttle.findOne({ assignedDriver: driver_id });
+      console.log("Found shuttle:", shuttle ? shuttle.shuttle_id : "None");
+
+      // Build query to get ALL bookings for this driver
+      const bookingQueries = [];
+
+      // Add shuttle bookings query if driver has an assigned shuttle
+      if (shuttle) {
+        bookingQueries.push({ shuttle_id: shuttle.shuttle_id });
+      }
+
+      // ALWAYS include QR payment bookings for this driver
+      bookingQueries.push({ 
+        shuttle_id: `QR-${driver_id}`,
+        paymentMethod: "qrcode"
+      });
+
+      console.log("Booking queries:", JSON.stringify(bookingQueries, null, 2));
+
+      // Fetch all bookings using $or query - NO POPULATE
+      const allBookings = await Booking.find({ 
+        $or: bookingQueries 
+      })
+        .sort({ createdAt: -1 })
+        .lean()
+        .exec();
+
+      console.log("Found bookings:", allBookings.length);
+
+      if (allBookings.length === 0) {
+        console.log("=== getDriverBookings END (no bookings) ===");
+        return {
+          bookings: [],
+          total: 0,
+          limit,
+          skip,
+          hasMore: false,
+        };
+      }
+
+      // Manually populate to avoid CastError
+      const Student = require("../models/student.model");
+      const Route = require("../models/route.model");
+
+      // Populate student and route data
+      for (let booking of allBookings) {
+        if (booking.student_id) {
+          try {
+            const student = await Student.findOne({ student_id: booking.student_id })
+              .select("firstName lastName phone email")
+              .lean();
+            if (student) {
+              booking.student_id = student;
+            }
+          } catch (err) {
+            console.warn(`Failed to populate student for booking ${booking.booking_id}:`, err.message);
+          }
+        }
+
+        if (booking.route_id) {
+          try {
+            const route = await Route.findOne({ route_id: booking.route_id })
+              .select("routeName routeCode")
+              .lean();
+            if (route) {
+              booking.route_id = route;
+            }
+          } catch (err) {
+            console.warn(`Failed to populate route for booking ${booking.booking_id}:`, err.message);
+          }
+        }
+      }
+
+      // Apply pagination
+      const total = allBookings.length;
+      const paginatedBookings = allBookings.slice(skip, skip + limit);
+
+      console.log("=== getDriverBookings END ===");
+      return {
+        bookings: paginatedBookings,
+        total,
+        limit,
+        skip,
+        hasMore: skip + limit < total,
+      };
+    } catch (error) {
+      console.error("=== getDriverBookings ERROR ===");
+      console.error("Error details:", error);
+      console.error("Error name:", error.name);
+      console.error("Error message:", error.message);
+      throw error;
+    }
+  }
 }
 
 module.exports = new BookingService();
+

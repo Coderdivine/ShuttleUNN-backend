@@ -13,6 +13,9 @@ router.get("/profile/:driver_id", DriverController.getProfile);
 router.put("/profile/:driver_id", DriverController.updateProfile);
 router.put("/change-password/:driver_id", DriverController.changePassword);
 
+// Stats endpoint
+router.get("/stats/:driver_id", DriverController.getStats);
+
 // Status management
 router.put("/status/:driver_id", DriverController.updateStatus);
 

@@ -1,5 +1,5 @@
 const BookingService = require("../services/booking.service");
-const Response = require("../utils/response");
+const response = require("../utils/response");
 
 class BookingController {
   async createBooking(req, res, next) {
@@ -92,7 +92,18 @@ class BookingController {
       const { shuttle_id } = req.params;
       const { limit = 20, skip = 0 } = req.query;
       const result = await BookingService.getShuttleBookings(shuttle_id, parseInt(limit), parseInt(skip));
-      return Response.success(res, result, "Shuttle bookings retrieved successfully", 200);
+      return res.status(200).send(response("Shuttle bookings retrieved successfully", result));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getDriverBookings(req, res, next) {
+    try {
+      const { driver_id } = req.params;
+      const { limit = 20, skip = 0 } = req.query;
+      const result = await BookingService.getDriverBookings(driver_id, parseInt(limit), parseInt(skip));
+      return res.status(200).send(response("Driver bookings retrieved successfully", result));
     } catch (error) {
       next(error);
     }

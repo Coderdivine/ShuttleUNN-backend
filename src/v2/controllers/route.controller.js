@@ -1,12 +1,12 @@
 const RouteService = require("../services/route.service");
-const Response = require("../utils/response");
+const response = require("../utils/response");
 
 class RouteController {
   async getAllRoutes(req, res, next) {
     try {
       const { limit = 20, skip = 0 } = req.query;
       const result = await RouteService.getAllRoutes(parseInt(limit), parseInt(skip));
-      return Response.success(res, result, "Routes retrieved successfully", 200);
+      return res.status(200).send(response("Routes retrieved successfully", result));
     } catch (error) {
       next(error);
     }
@@ -16,7 +16,7 @@ class RouteController {
     try {
       const { route_id } = req.params;
       const route = await RouteService.getRouteById(route_id);
-      return Response.success(res, route, "Route retrieved successfully", 200);
+      return res.status(200).send(response("Route retrieved successfully", route));
     } catch (error) {
       next(error);
     }
@@ -25,7 +25,7 @@ class RouteController {
   async createRoute(req, res, next) {
     try {
       const route = await RouteService.createRoute(req.body);
-      return Response.success(res, route, "Route created successfully", 201);
+      return res.status(201).send(response("Route created successfully", route));
     } catch (error) {
       next(error);
     }
@@ -35,7 +35,7 @@ class RouteController {
     try {
       const { route_id } = req.params;
       const updatedRoute = await RouteService.updateRoute(route_id, req.body);
-      return Response.success(res, updatedRoute, "Route updated successfully", 200);
+      return res.status(200).send(response("Route updated successfully", updatedRoute));
     } catch (error) {
       next(error);
     }
@@ -45,7 +45,7 @@ class RouteController {
     try {
       const { route_id } = req.params;
       const result = await RouteService.deleteRoute(route_id);
-      return Response.success(res, result, "Route deleted successfully", 200);
+      return res.status(200).send(response("Route deleted successfully", result));
     } catch (error) {
       next(error);
     }
@@ -55,7 +55,7 @@ class RouteController {
     try {
       const { route_id } = req.params;
       const result = await RouteService.getRouteStops(route_id);
-      return Response.success(res, result, "Route stops retrieved successfully", 200);
+      return res.status(200).send(response("Route stops retrieved successfully", result));
     } catch (error) {
       next(error);
     }
@@ -65,7 +65,7 @@ class RouteController {
     try {
       const { route_id } = req.params;
       const updatedRoute = await RouteService.addStop(route_id, req.body);
-      return Response.success(res, updatedRoute, "Stop added successfully", 201);
+      return res.status(201).send(response("Stop added successfully", updatedRoute));
     } catch (error) {
       next(error);
     }
@@ -75,7 +75,7 @@ class RouteController {
     try {
       const { route_id, stop_id } = req.params;
       const updatedRoute = await RouteService.removeStop(route_id, stop_id);
-      return Response.success(res, updatedRoute, "Stop removed successfully", 200);
+      return res.status(200).send(response("Stop removed successfully", updatedRoute));
     } catch (error) {
       next(error);
     }
@@ -85,7 +85,7 @@ class RouteController {
     try {
       const { query, limit = 10, skip = 0 } = req.query;
       const result = await RouteService.searchRoutes(query, parseInt(limit), parseInt(skip));
-      return Response.success(res, result, "Routes searched successfully", 200);
+      return res.status(200).send(response("Routes searched successfully", result));
     } catch (error) {
       next(error);
     }
@@ -96,7 +96,7 @@ class RouteController {
       const { stopName } = req.query;
       const { limit = 10, skip = 0 } = req.query;
       const result = await RouteService.getRoutesByStop(stopName, parseInt(limit), parseInt(skip));
-      return Response.success(res, result, "Routes retrieved successfully", 200);
+      return res.status(200).send(response("Routes retrieved successfully", result));
     } catch (error) {
       next(error);
     }

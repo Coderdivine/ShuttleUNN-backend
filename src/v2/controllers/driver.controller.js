@@ -114,6 +114,16 @@ class DriverController {
       next(error);
     }
   }
+
+  async getStats(req, res, next) {
+    try {
+      const { driver_id } = req.params;
+      const stats = await DriverService.getStats(driver_id);
+      return res.status(200).send(response("Stats retrieved successfully", stats));
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new DriverController();

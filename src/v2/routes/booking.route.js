@@ -9,6 +9,9 @@ router.get("/student/:student_id/trips", BookingController.getStudentTrips);
 // Shuttle bookings (must come before :booking_id routes)
 router.get("/shuttle/:shuttle_id/bookings", BookingController.getShuttleBookings);
 
+// Driver bookings (must come before :booking_id routes)
+router.get("/driver/:driver_id/bookings", BookingController.getDriverBookings);
+
 // Booking creation and retrieval
 router.post("/", BookingController.createBooking);
 router.get("/:booking_id", BookingController.getBooking);

@@ -1,12 +1,12 @@
 const ShuttleService = require("../services/shuttle.service");
-const Response = require("../utils/response");
+const response = require("../utils/response");
 
 class ShuttleController {
   async getAllShuttles(req, res, next) {
     try {
       const { limit = 20, skip = 0 } = req.query;
       const result = await ShuttleService.getAllShuttles(parseInt(limit), parseInt(skip));
-      return Response.success(res, result, "Shuttles retrieved successfully", 200);
+      return res.status(200).send(response("Shuttles retrieved successfully", result));
     } catch (error) {
       next(error);
     }
@@ -16,7 +16,7 @@ class ShuttleController {
     try {
       const { limit = 20, skip = 0 } = req.query;
       const result = await ShuttleService.getAvailableShuttles(parseInt(limit), parseInt(skip));
-      return Response.success(res, result, "Available shuttles retrieved successfully", 200);
+      return res.status(200).send(response("Available shuttles retrieved successfully", result));
     } catch (error) {
       next(error);
     }
@@ -26,7 +26,7 @@ class ShuttleController {
     try {
       const { shuttle_id } = req.params;
       const shuttle = await ShuttleService.getShuttleDetails(shuttle_id);
-      return Response.success(res, shuttle, "Shuttle details retrieved successfully", 200);
+      return res.status(200).send(response("Shuttle details retrieved successfully", shuttle));
     } catch (error) {
       next(error);
     }
